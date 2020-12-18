@@ -1,6 +1,6 @@
 const mongoose = require('mongoose')
 
-let staffSchema=new mongoose.Schema({
+const staffSchema=new mongoose.Schema({
     id:{
         type: String, 
         required: true,
@@ -20,6 +20,11 @@ let staffSchema=new mongoose.Schema({
         required: true,
         password: '123456'
     },
+    role: {
+        type: String,
+        required: true,
+        enum: ['HR', 'HOD', 'Coordinator', 'Instructor', 'TA']
+    },
     salary: {
         type: Number,
         required: true
@@ -34,13 +39,8 @@ let staffSchema=new mongoose.Schema({
         type: String
     },
     dayOff: {  // sat-0, sun-1, mon-2, tues-3, wed-4, thurs-5
-        type: Number
-
-    },
-    role: {
-        type: String,
-        required: true,
-        enum: ['HR', 'HOD', 'Coordinator', 'Instructor', 'TA']
+        type: Number,
+        required: true
     },
     annualLeaves: {
         type: Number,
@@ -69,10 +69,11 @@ let staffSchema=new mongoose.Schema({
                 enum : ["signIn" ,"signOut"],
                 required : true
             }
-        }]   
+        }],
+        default: []   
     },
-    extraInfo : {
-        type : Object
+    extraInfo:{
+        type: Object
     }
 })
 
