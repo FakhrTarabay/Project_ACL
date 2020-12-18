@@ -71,6 +71,9 @@ const staffSchema=new mongoose.Schema({
             }
         }],
         default: []   
+    },
+    extraInfo:{
+        type: Object
     }
 })
 
