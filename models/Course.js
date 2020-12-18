@@ -1,19 +1,18 @@
 const mongoose = require('mongoose')
-
-let courseSchema = new mongoose.Schema({
-    name:{ 
-            type: String, 
-            required: true
+const courseSchema = mongoose.Schema({
+    name : {
+        type : String,
+        required : true
     },
-    instructors: {
-            type: []
+    instructors : {
+        type : []
     },
-    coordinator: {
-            type: String
+    coordinator : {
+        type : String
     },
-    TAs: {
-            type: []
+    TAs : {
+        type : []
     }
 })
 
-module.exports=mongoose.model('course', courseSchema)
+module.exports = mongoose.model('course',courseSchema)
