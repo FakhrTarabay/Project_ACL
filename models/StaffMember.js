@@ -35,12 +35,10 @@ let staffSchema=new mongoose.Schema({
     },
     dayOff: {  // sat-0, sun-1, mon-2, tues-3, wed-4, thurs-5
         type: Number
-
     },
     role: {
-        type: String,
-        required: true,
-        enum: ['HR', 'HOD', 'Coordinator', 'Instructor', 'TA']
+        type: [],
+        required: true
     },
     annualLeaves: {
         type: Number,
