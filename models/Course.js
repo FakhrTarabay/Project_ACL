@@ -5,15 +5,15 @@ const courseSchema = mongoose.Schema({
         required : true,
         unique : true
     },
-    instructors : {
-        type : []
+    instructors: {
+            type: []
     },
-    coordinator : {
-        type : String
+    coordinator: {
+            type: String
     },
-    TAs : {
-        type : []
+    TAs: {
+            type: []
     }
 })
 
-module.exports = mongoose.model('course',courseSchema)
+module.exports=mongoose.model('course', courseSchema)

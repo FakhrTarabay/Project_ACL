@@ -8,6 +8,7 @@ let facultySchema = mongoose.Schema({
      departments : {
         type : []
      }   
+
 })
 
-module.exports = mongoose.model('faculty',facultySchema)
+module.exports=mongoose.model('faculty', facultySchema)
