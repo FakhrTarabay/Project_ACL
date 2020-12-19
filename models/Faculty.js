@@ -2,7 +2,8 @@ const mongoose = require('mongoose')
 let facultySchema = mongoose.Schema({
      name : {
         type : String,
-        required : true
+        required : true,
+        unique : true
      },
      departments : {
         type : []
