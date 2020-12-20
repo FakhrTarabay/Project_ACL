@@ -43,6 +43,9 @@ let requestSchema = new mongoose.Schema({
     },
     comment: {
         type: String
+    },
+    schedule_ID : {
+        type : String
     }
 })
 
