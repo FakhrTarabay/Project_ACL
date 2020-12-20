@@ -39,11 +39,7 @@ const staffSchema=new mongoose.Schema({
         type: String
     },
     dayOff: {  // sat-0, sun-1, mon-2, tues-3, wed-4, thurs-5
-        type: Number
-    },
-    role: {
-        type: [],
-
+        type: Number,
         required: true
     },
     annualLeaves: {

@@ -152,6 +152,14 @@ router.route("/RejectRequest").post(async (req, res) => {
     console.log(err);
   }
 });
+router.route('/addUPdelete').post(async(req,res)=>{
+  try {
+    
+
+  } catch (err){
+    console.log(err);
+  }
+})
 const { app } = require("./app");
 require("dotenv").config();
 mongoose
