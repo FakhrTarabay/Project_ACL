@@ -20,21 +20,6 @@ let requestSchema = new mongoose.Schema({
         required: true,
         enum: ['Accepted', 'Rejected', 'Pending']
     },
-    course: {
-        type: String
-    },
-    day: {
-        type: Number
-    },
-    slot: {
-        type: Number,
-        min: 1,
-        max: 5
-    },
-    location: {
-        type: String,
-        required: true
-    },
     startDate: {
         type: Date
     },
