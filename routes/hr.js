@@ -264,7 +264,6 @@ router.route('/updateCourse')
     req.body.department -> the selected Department
     req.body.courses -> array of courses' name to be deleted
 */
-
 router.route('/deleteCourse')
 .post(async (req,res)=>{
     try {
@@ -375,7 +374,7 @@ function getStartEndDates() {
   	    else {
     	    startMonth = currentMonth - 1
       	    startYear = currentYear
-        } 
+        }
     }
     return {
         startDate : new Date(startYear,startMonth,startDay,2,0,0),
@@ -383,7 +382,7 @@ function getStartEndDates() {
     }
 }
 
-function missingDays_missingHours_extraHours(records,dayOff,startDate,endDate){
+function missingDays_missingHours_extraHours(records, leaves, dayOff, startDate, endDate){
     let missingDays = [];
     let dEnd, dayAttendance, dayWeek, signIn, signOut;
     let foundSignOut = false , attended = false;
@@ -391,33 +390,39 @@ function missingDays_missingHours_extraHours(records,dayOff,startDate,endDate){
     for (dStart = new Date(startDate) ; dStart <= endDate; dStart.setDate(dStart.getDate() + 1)) {
         dEnd = new Date(dStart)
         dEnd.setHours(25,59,59)
-        dayWeek = dStart.getDay()
-        if (dayWeek != dayOff && dayWeek != 5){
-            dayAttendance = records.filter(function (record) {
-                return record.date.getTime() >= dStart.getTime() && record.date.getTime() <= dEnd.getTime()})
-            for (let i = dayAttendance.length -1 ; i >= 0 ; i--){
-                if (dayAttendance[i].type.localeCompare("signOut") == 0){
-                    foundSignOut = true;
-                    signOut = dayAttendance[i].date; 
+        dayWeek = dStart.getDay() // 0 -> sunday , 6 -> saturday
+        dayAttendance = records.filter(function (record) {
+            return record.date.getTime() >= dStart.getTime() && record.date.getTime() <= dEnd.getTime()
+        })
+        dayLeaves = leaves.filter(function (leave) {
+            return dStart.getTime() >= leave.startDate.getTime() && dStart.getTime() < leave.endDate.getTime()
+        })
+        for (let i = dayAttendance.length -1 ; i >= 0 ; i--){
+            if (dayAttendance[i].type.localeCompare("signOut") == 0){
+                foundSignOut = true;
+                signOut = dayAttendance[i].date; 
+            }
+            if (foundSignOut && dayAttendance[i].type.localeCompare("signIn") == 0){
+                signIn = dayAttendance[i].date;
+                foundSignOut = false;
+                attended = true;
+                attendanceTime = signOut.getTime() - signIn.getTime();
+                attendanceTime /= 60000
+                if (dayWeek == 5 || dayWeek == dayOff){
+                    missingHours -= attendanceTime
                 }
-                if (foundSignOut && dayAttendance[i].type.localeCompare("signIn") == 0){
-                    signIn = dayAttendance[i].date;
-                    foundSignOut = false;
-                    attended = true;
-                    attendanceTime = signOut.getTime() - signIn.getTime();
-                    attendanceTime /= 60000
+                else
                     missingHours += (504 - attendanceTime) 
-                }
             }
-            if (!attended){
-                missingDays.push(new Date(dStart))
-            }
-            foundSignOut = false;
-            attended = false;
-            signIn = null;
-            signOut = null;
-            attendanceTime = 0;    
-        }             
+        }
+        if (!attended && dayWeek != 5 && dayWeek != dayOff && dayLeaves.length == 0){
+            missingDays.push(new Date(dStart))
+        }
+        foundSignOut = false;
+        attended = false;
+        signIn = null;
+        signOut = null;
+        attendanceTime = 0;             
     }  
     if (missingHours < 0){
         extraHours = (missingHours * -1)
@@ -438,13 +443,18 @@ router.route('/viewMissingDaysHours')
             })
             return member;
         })
-        staffMembersRecords.forEach(function (member) {
-            missingDaysHours = missingDays_missingHours_extraHours(member.attendanceRecords,member.dayOff,startEndDates.startDate,startEndDates.endDate)
+        for (let i = 0 ; i < staffMembersRecords.length ; i++){
+            let leavesRecords = await requestModel.find({
+                sender : staffMembersRecords[i].id,
+                type : {$in : ['Annual Leaves', 'Sick Leaves', 'Accidental Leaves', 'Maternity Leaves', 'Compensation Leaves']},
+                status : "Accepted"
+            })
+            missingDaysHours = missingDays_missingHours_extraHours(staffMembersRecords[i].attendanceRecords,leavesRecords,staffMembersRecords[i].dayOff,startEndDates.startDate,startEndDates.endDate)
             if (missingDaysHours.missingDays.length > 0 || missingDaysHours.missingHours > 0){
-                output.push(({id : member.id, name : member.name, missingDays : missingDaysHours.missingDays,
+                output.push(({id : staffMembersRecords[i].id, name : staffMembersRecords[i].name, missingDays : missingDaysHours.missingDays,
                      missingHours : missingDaysHours.missingHours , extraHours :missingDaysHours.extraHours}))
             }
-        })
+        }
         res.send(output)
         } catch (error) {
             res.send(error)            
@@ -555,5 +565,4 @@ router.route('/deleteStaffMembers')
         res.send(deletedMembers)
     }
 })
-
 module.exports=router;
