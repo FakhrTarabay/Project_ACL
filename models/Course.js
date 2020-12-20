@@ -1,9 +1,10 @@
 const mongoose = require('mongoose')
-const courseSchema = mongoose.Schema({
-    name : {
-        type : String,
-        required : true,
-        unique : true
+
+let courseSchema = new mongoose.Schema({
+    name:{ 
+            type: String, 
+            required: true,
+            unique: true
     },
     instructors: {
             type: []

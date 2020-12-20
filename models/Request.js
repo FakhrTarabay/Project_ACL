@@ -20,14 +20,14 @@ let requestSchema = new mongoose.Schema({
         required: true,
         enum: ['Accepted', 'Rejected', 'Pending']
     },
-    date: {
+    startDate: {
+        type: Date
+    },
+    endDate: {
         type: Date
     },
     comment: {
         type: String
-    },
-    date : {
-        type : Date
     }
 })
 
