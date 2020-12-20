@@ -29,11 +29,11 @@ let requestSchema = new mongoose.Schema({
     endDate: {
         type: Date
     },
+    requestDate: {
+        type: Date
+    },
     comment: {
         type: String
-    },
-    schedule_ID : {
-        type : String
     }
 })
 
