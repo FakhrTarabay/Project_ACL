@@ -14,6 +14,7 @@ let requestSchema = new mongoose.Schema({
         type: String,
         required: true
     },
+    // the date on which the request was sent
     requestDate : {
         type : Date
     },
@@ -22,11 +23,20 @@ let requestSchema = new mongoose.Schema({
         required: true,
         enum: ['Accepted', 'Rejected', 'Pending']
     },
+    //start date of any leave,specified by the sender 
     startDate: {
         type: Date
     },
+    // end date of any leave,specified by the receiver 
     endDate: {
         type: Date
+    },
+
+    //Sick and maternity leaves have duration of one month,
+    // in case of compensation leave, this field will contain the date of the compensated  Date
+    // make sure that startDate & compensationDate start at 12 AM!! ex: 2020-3-1 00:00:00
+    compensationDate : {
+        type : Date
     },
     comment: {
         type: String
