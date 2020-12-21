@@ -13,15 +13,17 @@ router.route('/login')
         if(!staff.loggedInBefore){
             const salt = await bcrypt.genSalt(10)
             const newPassword = await bcrypt.hash(req.body.newPassword, salt)
-            staff.update({email: req.body.email}, {password: newPassword})
-            staff.update({email: req.body.email}, {loggedInBefore: true})
+            await staffMember.findOneAndUpdate({email: req.body.email}, {password: newPassword, loggedInBefore: true})
+            const token = jwt.sign({id: staff.id, role: staff.role}, process.env.TOKEN_SECRET, {expiresIn: '1d'})
+            console.log('passeddd')
+            res.header('token', token).send(token)
         }
         else {
             const correctPass= await bcrypt.compare(req.body.password, staff.password)
             if(correctPass){
                 try{
-                    const token = jwt.sign({id: staff.id}, process.env.TOKEN_SECRET, {expiresIn: '1d'})
-                    console.log('passeddd')
+                    const token = jwt.sign({id: staff.id, role: staff.role}, process.env.TOKEN_SECRET, {expiresIn: '1d'})
+                    console.log(staff.role)
                     res.header('token', token).send(token)
                 }
                 catch(error){

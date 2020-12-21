@@ -11,21 +11,24 @@ require('dotenv').config();
 app.use('', login_route)
 
 app.use(async(req,res,next)=>{
-    const token=req.headers.token
-    const checkedToken = await blocklist.findOne({header: token})
-    console.log(token);
-    console.log(await blocklist.findOne({header: token}))
-    if(!checkedToken){
-        const verified = jwt.verify(token,process.env.TOKEN_SECRET);
-        console.log(verified);
-        req.user=verified;
+    try {
+        const token=req.headers.token
+        const checkedToken = await blocklist.findOne({header: token})
+        if(!checkedToken){
+            console.log(token)
+            const verified = jwt.verify(token,process.env.TOKEN_SECRET);
+            req.user=verified;
+        }
+        next();
+    } 
+    catch (error) {
+        res.send("Log in first!")    
     }
-    next();
 
 })
 app.use('', staff_routes)
 
-app.use('', hr_routes)
+app.use('/HR/', hr_routes)
 
 //app.use()
 

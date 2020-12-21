@@ -4,8 +4,7 @@ let requestSchema = new mongoose.Schema({
     type: {
         type: String, 
         required: true,
-        enum: ['Slot Linking', 'Replacement', 'Change dayoff', 'Annual Leaves', 'Sick Leaves', 
-        'Accidental Leaves', 'Maternity Leaves', 'Compensation Leaves']
+        enum: ['Slot Linking', 'Replacement', 'Change dayoff', 'Annual Leaves', 'Sick Leaves', 'Accidental Leaves', 'Maternity Leaves', 'Compensation Leaves']
     },
     sender: {
         type: String, 
@@ -14,6 +13,9 @@ let requestSchema = new mongoose.Schema({
     receiver: {
         type: String,
         required: true
+    },
+    requestDate : {
+        type : Date
     },
     status: {
         type: String,
@@ -26,8 +28,14 @@ let requestSchema = new mongoose.Schema({
     endDate: {
         type: Date
     },
+    compensationDate: {
+        type: Date
+    },
     comment: {
         type: String
+    },
+    schedule_ID : {
+        type : String
     }
 })
 
