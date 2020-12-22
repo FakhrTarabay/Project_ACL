@@ -7,7 +7,7 @@ const bcrypt = require('bcrypt')
 const jwt = require('jsonwebtoken')
 require('dotenv').config()
 
-router.route('/signin')
+router.route('/signIn')
 .post(async (req,res)=> {
     if(req.headers.id){
         const token = req.user.id
