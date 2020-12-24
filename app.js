@@ -1,7 +1,7 @@
 const express=require('express');
 const app=express();
 const login_route = require('./routes/login')
-const hr_routes = require('./routes/hr_routes')
+//const hr_routes = require('./routes/hr_routes')
 const staff_routes = require('./routes/staff_routes')
 app.use(express.json());
 const jwt=require('jsonwebtoken')
@@ -22,7 +22,7 @@ app.use(async(req,res,next)=>{
 })
 app.use('', staff_routes)
 
-app.use('', hr_routes)
+//app.use('', hr_routes)
 
 //app.use()
 

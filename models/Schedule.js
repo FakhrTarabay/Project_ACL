@@ -17,7 +17,6 @@ let scheduleSchema = new mongoose.Schema({
     },
     academicMember: {
         type: String, 
-        required: true,
         default: null
     },
     location: {
