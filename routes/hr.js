@@ -14,18 +14,26 @@ const jwt = require('jsonwebtoken')
 require('dotenv').config()
 
 // display location
+// Test done.
+// Read me
 router.route('/viewLocations')
 .get(async (req,res) => {
-    const locations = await locationModel.find();
-    res.send(locations);
+    try {
+        const locations = await locationModel.find();
+        res.send(locations);
+    } catch (error) {
+        res.send(error)
+    }
 })
 
 // adds a location
+// test Done
+// Read Me
 router.route('/addLocation')
 .post(async (req,res) =>{
     let room = await locationModel.findOne({location: req.body.location})
     if (room){
-        res.send("This room is already in use");
+        res.send(`Location ${req.body.location} is already in use`);
     }
     else{
         const newLocation = new locationModel({
@@ -35,14 +43,15 @@ router.route('/addLocation')
         })
         try {
             await newLocation.save();
-            res.send("Location added successfully");
+            res.send(`Location ${req.body.location} added successfully`);
         } 
         catch (error) {
-            res.send("please make you sure that you have entered the required fields");
+            res.send(error);
         }
      }
 });
 
+// Read me
 // deletes a location using the location name
 router.route('/deleteLocation')
 .post(async(req,res) => {
@@ -51,98 +60,110 @@ router.route('/deleteLocation')
         if (deletedLocation){
             await scheduleModel.updateMany({location : req.body.location},{location : null})
             await staffModel.updateMany({office : req.body.location},{office : null})
-            res.send('deleted')
+            res.send(`location ${req.body.location} deleted successfully`)
         }
         else
-            res.send("there is no such location")    
+            res.send(`there is no location called ${req.body.location}`)    
     } catch (error) {
         res.send(error)
     }
 })
 
 // updates a location
+// Test Done
+// Read me
 router.route('/updateLocation')
 .post(async(req,res) => {
     try {
         foundLocation = await locationModel.findOne({location : req.body.updates.location})
         if (foundLocation){
-            res.send("this location is already in use")
+            res.send(`location ${req.body.updates.location} is already in use`)
         }
         else {
             const prevLocation = await locationModel.findOne({location : req.body.location})
+            if (!prevLocation){
+                res.send(`There is no location called ${req.body.location}`)    
+                res.end()
+            }
             if (req.body.updates.maxCapacity < prevLocation.currentCapacity){
-                res.send("new Maximum Capacity is smaller than the current capacity!")
+               res.send(`new Maximum ${req.body.updates.maxCapacity} Capacity is less than the current capacity ${prevLocation.currentCapacity}!`)
+               res.end()
             }
             else{
                 await locationModel.findOneAndUpdate({location : req.body.location},req.body.updates)
-                if (prevLocation){
-                    if (req.body.updates.location){
-                        await scheduleModel.updateMany({location : req.body.location},{location : req.body.updates.location})
-                        await staffModel.updateMany({office : req.body.location},{office : req.body.updates.location})
-                    }
-                    res.send("Successful location update!")
+                if (req.body.updates.location) {
+                    await scheduleModel.updateMany({location : req.body.location},{location : req.body.updates.location})
+                    await staffModel.updateMany({office : req.body.location},{office : req.body.updates.location})
+                }
+                 res.send(`location ${req.body.location} updated Successfully!`)
                 }   
-                else
-                    res.send("There is no Location with the given name")    
             }
         }
-    }
     catch (error) {
         res.send(error)
     }    
 })
 ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+/* Test Done, Read Me*/
 router.route('/addFaculty')
 .post(async (req,res) =>{
     try {
         const foundFaculty = await facultyModel.findOne({name : req.body.faculty})  
         if (foundFaculty)
-        res.send("mhya ma3molaaaaaaa")
+            res.send(`Faculty ${req.body.faculty} already exists`)
         else {
             const newFaculty = new facultyModel({
                 name : req.body.faculty
             })
             await newFaculty.save()
-            res.send("Faculty added successfuly")
+            res.send(`Faculty ${req.body.faculty} added successfully`)
         }
     } catch (error) {
         res.send(error)
     }    
 })
 
+// Test Done
+// Read Me
 router.route('/deleteFaculty')
 .post(async (req,res) =>{
     try {
         const deletedFaculty = await facultyModel.findOneAndDelete({name : req.body.name})
         if (deletedFaculty){
             await staffModel.updateMany({faculty : req.body.name},{faculty : null})
-            res.send("Faculty Deleted!")
+            res.send(`Faculty ${req.body.name} deleted successfully!`)
         }
         else 
-            res.send("There is no such a Faculty")    
+            res.send(`There is no Faculty called ${req.body.name}`)    
     } catch (error) {
         res.send(error)        
     }
 })
 
+
+// Test Done, read Me
 router.route('/updateFaculty')
 .post(async (req,res) =>{
     try {
         const prevFaculty = await facultyModel.findOneAndUpdate({name : req.body.name},req.body.updates)
-        if (!prevFaculty)
+        if (prevFaculty){
+            console.log(prevFaculty)
             if (req.body.updates.name){
                 await staffModel.updateMany({faculty : req.body.name},{faculty : req.body.updates.name})
-                res.send("faculty updated successfuly!")
+                res.send(`faculty ${req.body.name} updated successfuly!`)
+            }
         }
-        else
-            res.send("There is no faculty with the given name")    
+        else {
+            res.send(`faculty ${req.body.name} does not exist`)
+        }  
     } catch (error) {
         res.send(error)    
     }
 })
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-
+// Test Done
+// Read Me
 router.route('/addDepartment')
 .post(async (req,res) =>{
     try {
@@ -163,23 +184,23 @@ router.route('/addDepartment')
                 {departments : req.body.name}
             })
         res.send(`Department ${req.body.name} is added to Faculty ${req.body.faculty}`)     
-         
     } catch (error) {
         res.send(error)
     }
 })
-
+// Test Done
+// Read me
 router.route('/updateDepartment')
 .post(async (req,res) =>{
     try {
         const foundFaculty = await facultyModel.findOne({name : req.body.facultyName , departments : [req.body.name]})
         if (foundFaculty){
-            const prevDepartment =await departmentModel.findOneAndUpdate({name : req.body.name},req.body.updates)
+            const prevDepartment = await departmentModel.findOneAndUpdate({name : req.body.name},req.body.updates)
             if (prevDepartment){
                 if (req.body.updates.name){
                     await staffModel.updateMany({department : req.body.name},{department : req.body.updates.name})
                     await facultyModel.findOneAndUpdate({name : req.body.facultyName},{$addToSet : {departments : req.body.updates.name}})
-                    await facultyModel.findOneAndUpdate({name : req.body.facultyName},{$pull : {departments : {$in : [req.body.name]}}})
+                    await facultyModel.findOneAndUpdate({name : req.body.facultyName},{$pull : {departments : req.body.name}})
                 }
                 if (req.body.updates.HOD){
                     await staffModel.updateOne({id : req.body.updates.HOD}, {$addToSet : {role : "HOD"}})    
@@ -197,24 +218,33 @@ router.route('/updateDepartment')
     }
 })
 
-router.route('/deleteDepartments')
+// Test Done
+// Read me
+router.route('/deleteDepartment')
 .post(async (req,res)=>{
     try {
-        await facultyModel.update({name : req.body.faculty} , 
-            {$pull: {departments : {$in : req.body.departments}}},{ multi: true})                
-        const staffMembers  = (await staffModel.find({department : {$in : req.body.departments}},{id : 1, _id : 0})).map(function (staff) {
-            return staff.id;
-          });
-        const courses = (await departmentModel.find({name : {$in : req.body.departments}},{courses : 1,_id : 0})).map(function (obj){
-            return obj.courses[0];
-        })
-        await staffModel.updateMany({faculty : req.body.faculty, department : {$in : req.body.departments}},{department : null})
-        await scheduleModel.updateMany({course : {$in : courses}, academicMember : {$in : staffMembers}},{academicMember : null})
-        await courseModel.updateMany({name : {$in : courses}}, {$pull :{
-            instructors : {$in : staffMembers},
-            TAs : {$in : staffMembers},
-            coordinator : {$in : staffMembers}}})
-        res.send("Department deleted successfully")
+        const foundFaculty = await facultyModel.findOneAndUpdate({name : req.body.faculty} , 
+            {$pull: {departments : req.body.department}},{ multi: true})                
+        if (!foundFaculty){
+            res.send(`There is no Department called ${req.body.department} under Faculty ${req.body.faculty}`)
+            res.end()
+        }
+        else {
+
+            const staffMembers  = (await staffModel.find({department : req.body.department},{id : 1, _id : 0})).map(function (staff) {
+                return staff.id;
+            })
+            const courses = (await departmentModel.find({name : req.body.department},{courses : 1,_id : 0})).map(function (obj){
+            return obj.courses;
+            })[0]
+            await staffModel.updateMany({faculty : req.body.faculty, department : req.body.department},{department : null})
+            await scheduleModel.updateMany({course : {$in : courses}, academicMember : {$in : staffMembers}},{academicMember : null})
+            await courseModel.updateMany({name : {$in : courses}}, {$pull :{
+                instructors : {$in : staffMembers},
+                TAs : {$in : staffMembers},
+                coordinator : {$in : staffMembers}}})
+            res.send(`Department ${req.body.department} under Faculty ${req.body.faculty} deleted successfully`)
+        }
     } catch (error) {
         res.send(error)
     }
@@ -226,7 +256,7 @@ router.route('/deleteDepartments')
     req.body.name -> name of the course to be added
     req.body.department -> name of the department where the course will be added
 */ 
-
+// Read Me
 router.route('/addCourse')
 .post(async (req,res) => {
     try {
@@ -251,7 +281,7 @@ router.route('/addCourse')
         res.send(error)        
     }
 })
-
+// Read me
 router.route('/updateCourse')
 .post(async (req,res) => {
     try {
@@ -279,19 +309,21 @@ router.route('/updateCourse')
     req.body.department -> the selected Department
     req.body.courses -> array of courses' name to be deleted
 */
+
+// Read Me
 router.route('/deleteCourse')
 .post(async (req,res)=>{
     try {
-        await departmentModel.update({name : req.body.department} , {$pull: {courses : {$in : req.body.courses}}},{ multi: true})
+        await departmentModel.update({name : req.body.department} , {$pull: {courses : req.body.course}},{ multi: true})
         const staffMembers = await staffModel.find({department : req.body.department}, {id : 1,_id : 0}).map(function (staff) {
             return staff.id;
           });
-        await courseModel.updateMany({name : {$in : req.body.courses}}, {$pull :{
+        await courseModel.updateMany({name : req.body.course}, {$pull :{
             instructors : {$in : staffMembers},
             TAs : {$in : staffMembers},
             coordinator : {$in : staffMembers}
         }},{ multi: true})
-        await scheduleModel.updateMany({course : {$in : req.body.courses},academicMember : {$in : staffMembers}},{academicMember : null})
+        await scheduleModel.update({course : req.body.course, academicMember : {$in : staffMembers}},{academicMember : null})
         res.send("Courses deleted successfully")
     } catch (error) {
         res.send(error)
@@ -299,6 +331,9 @@ router.route('/deleteCourse')
 })
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+/*
+Read Me
+*/
 router.route('/updateSalary')
 .post(async (req,res) =>{
     if (!req.body.salary && req.body.salary !=0){
@@ -319,6 +354,9 @@ router.route('/updateSalary')
     }
 })
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+/*
+Read Me
+*/ 
 router.route('/viewAttendance')
 .get(async (req,res) =>{
     try {
@@ -333,7 +371,9 @@ router.route('/viewAttendance')
         res.send(error)
     }
 })
-
+/*
+Read Me Done
+*/
 router.route('/addAttendance')
 .post(async (req,res) => {
     if (req.body.id.localeCompare(req.user.id)==0){
@@ -344,9 +384,9 @@ router.route('/addAttendance')
            const foundStaff = await staffModel.findOne({id : req.body.id})
            if (!foundStaff){
                res.send(`There is no staff member with ID ${req.body.id}`)
-               res.end()
            }
-           await staffModel.update({id : req.body.id},
+           else {
+               await staffModel.update({id : req.body.id},
                 {$push :{
                     attendanceRecords : {
                         $each :  req.body.newAttendanceRecords,
@@ -355,6 +395,7 @@ router.route('/addAttendance')
                 }
             })
             res.send("Attendance updated successfully!")
+        }
        } catch (error) {
            res.send(error)
        } 
@@ -402,12 +443,33 @@ function getStartEndDates() {
     }
 }
 
+// return 1 -> date_One > date_Two , 0 -> date_One = date_Two, -1 -> date_One < date_Two
+function compareDates(date_One,date_Two){
+    if (date_One.getFullYear() > date_Two.getFullYear())
+        return 1;
+    else if (date_One.getFullYear() < date_Two.getFullYear())
+        return -1;    
+    else{
+        if (date_One.getMonth() > date_Two.getMonth())
+            return 1;
+        else if (date_One.getMonth() < date_Two.getMonth())
+            return -1;
+        else {
+            if (date_One.getDate() > date_Two.getDate())
+                return 1;
+            else if (date_One.getDate() < date_Two.getDate())
+                return -1;
+            else
+                return 0;        
+        }        
+    }    
+}
+
 function missingDays_missingHours_extraHours(records, leaves, dayOff, startDate, endDate){
     let missingDays = [];
     let dEnd, dayAttendance, dayLeaves, dayWeek, signIn, signOut;
     let foundSignOut = false , attended = false;
     let attendanceTime = 0 ,missingHours = 0, extraHours = 0;
-    
     let compensationDates = leaves.map(function (leave) {
         if (leave.type == "Compensation Leaves"){
             return leave.compensationDate
@@ -416,12 +478,15 @@ function missingDays_missingHours_extraHours(records, leaves, dayOff, startDate,
     for (dStart = new Date(startDate) ; dStart <= endDate; dStart.setDate(dStart.getDate() + 1)) {
         dEnd = new Date(dStart)
         dEnd.setHours(25,59,59)
+        // dStart.setHours(3,0,0)
         dayWeek = dStart.getDay() // 0 -> sunday , 6 -> saturday
         dayAttendance = records.filter(function (record) {
-            return record.date.getTime() >= dStart.getTime() && record.date.getTime() <= dEnd.getTime()
+            // return record.date.getTime() >= dStart.getTime() && record.date.getTime() <= dEnd.getTime()
+            return (compareDates(record.date,dStart) == 0)            
         })
         dayLeaves = leaves.filter(function (leave) {
-            return dStart.getTime() >= leave.startDate.getTime() && dStart.getTime() < leave.endDate.getTime()
+            // return dStart.getTime() >= leave.startDate.getTime() && dStart.getTime() < leave.endDate.getTime()
+            return (compareDates(dStart,leave.startDate) >= 0 && compareDates(dStart,leave.endDate) >= 0)
         })
 
         for (let i = dayAttendance.length -1 ; i >= 0 ; i--){
@@ -435,7 +500,11 @@ function missingDays_missingHours_extraHours(records, leaves, dayOff, startDate,
                 attended = true;
                 attendanceTime = signOut.getTime() - signIn.getTime();
                 attendanceTime /= 60000
-                if (dayWeek == dayOff && !compensationDates.map(function (leave){return leave.getTime() == dStart.getTime()})){
+                if (dayWeek == dayOff 
+                    && !compensationDates.map(function (leave){
+                        // return leave.getTime() == dStart.getTime()
+                        return compareDates(leave,dStart) == 0
+                    })){
                     missingHours -= attendanceTime
                 }
                 else
@@ -466,7 +535,8 @@ router.route('/viewMissingDaysHours')
         let startEndDates = getStartEndDates()
         const staffMembersRecords = (await staffModel.find({},{id : 1, attendanceRecords : 1, name : 1, dayOff : 1, _id : 0})).map(function (member){
             member.attendanceRecords = member.attendanceRecords.filter(function (record) {
-                return (record.date.getTime() >= startEndDates.startDate.getTime() && record.date.getTime() < startEndDates.endDate.getTime())
+                // return (record.date.getTime() >= startEndDates.startDate.getTime() && record.date.getTime() < startEndDates.endDate.getTime())
+                return (compareDates(record.date,startEndDates.startDate) >=0 &&  compareDates(record.date,startEndDates.endDate) <=0)
             })
             return member;
         })
@@ -489,6 +559,7 @@ router.route('/viewMissingDaysHours')
 })
         
 /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+/*Read Me*/ 
 router.route('/registerStaff')
 .post(async (req,res) =>{
     try {
@@ -550,6 +621,7 @@ router.route('/registerStaff')
     }       
 })
 
+/* Read Me Done */
 router.route('/updateStaffMember')
 .post(async (req,res)=> {
     try {
@@ -558,32 +630,31 @@ router.route('/updateStaffMember')
                 const foundFaculty = await facultyModel.findOne({name : req.body.updates.faculty})
                 if (!foundFaculty){
                     res.send(`There is no faculty called ${req.body.updates.faculty}`)
-                    res.end()
                 }
             }
-            if (req.body.updates.department){
+            else if (req.body.updates.department){
                 const foundDepartment = await departmentModel.findOne({name : req.body.updates.department})
                 if (!foundDepartment){
                     res.send(`There is no department called ${req.body.updates.department}`)
-                    res.end()
                 }
             }
+            await staffModel.findOneAndUpdate({id : req.body.id}, req.body.updates)
         }
-        const staff = await staffModel.findOneAndUpdate({id : req.body.id}, req.body.updates)
-        if (staff){
-            if (staff.role.includes("HOD")){
-                await departmentModel.findOneAndUpdate({HOD : staff.id},{HOD : null})
-                await departmentModel.findOneAndUpdate({name : req.body.updates.department},{HOD : req.body.id})
-            }
-            res.send(`StaffMember with ID ${req.body.id} updated successfully`)
-        }
-        else 
-            res.send(`${req.body.id} is not connected to any Staff Member!`)    
+        // if (staff){
+        //     if (staff.role.includes("HOD")){
+        //         await departmentModel.findOneAndUpdate({HOD : staff.id},{HOD : null})
+        //         await departmentModel.findOneAndUpdate({name : req.body.updates.department},{HOD : req.body.id})
+        //     }
+        //     res.send(`StaffMember with ID ${req.body.id} updated successfully`)
+        // }
+        // else 
+        //     res.send(`${req.body.id} is not connected to any Staff Member!`)    
     } catch (error) {
         res.send(error)
     }
 })
 
+/* Read Me Done */
 router.route('/deleteStaffMember')
 .post(async (req,res) => {
     try { 
@@ -604,4 +675,5 @@ router.route('/deleteStaffMember')
         res.send(error)
     }
 })
+
 module.exports=router;
