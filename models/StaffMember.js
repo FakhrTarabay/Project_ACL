@@ -69,6 +69,11 @@ let staffSchema=new mongoose.Schema({
             }
         }]   
     },
+    gender : {
+        type : String,
+        required : true,
+        enum : ["Male","Female"]
+    },
     extraInfo : {
         type : Object
     }
