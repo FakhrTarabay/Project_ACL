@@ -40,6 +40,6 @@ app.use('/Coordinator', coordinator_routes)
 
 app.use('/AcademicMember', academicMember_routes)
 
-app.use('/Instructor', instructor_routes)
+app.use('/instructor', instructor_routes)
 
 module.exports.app=app; 
