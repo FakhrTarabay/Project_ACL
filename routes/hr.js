@@ -11,13 +11,13 @@ const courseModel = require('../models/course')
 const requestModel = require('../models/Request')
 const bcrypt = require('bcrypt')
 const jwt = require('jsonwebtoken')
+const functions = require('./functions')
 require('dotenv').config()
 
 // display location
 // Test done.
 // Read me
-router.route('/viewLocations')
-.get(async (req,res) => {
+router.route('/viewLocations').get(async (req,res) => {
     try {
         const locations = await locationModel.find();
         res.send(locations);
@@ -29,8 +29,7 @@ router.route('/viewLocations')
 // adds a location
 // test Done
 // Read Me
-router.route('/addLocation')
-.post(async (req,res) =>{
+router.route('/addLocation').post(async (req,res) =>{
     let room = await locationModel.findOne({location: req.body.location})
     if (room){
         res.send(`Location ${req.body.location} is already in use`);
@@ -53,8 +52,7 @@ router.route('/addLocation')
 
 // Read me
 // deletes a location using the location name
-router.route('/deleteLocation')
-.post(async(req,res) => {
+router.route('/deleteLocation').post(async(req,res) => {
     try {
         const deletedLocation = await locationModel.findOneAndDelete({location : req.body.location})
         if (deletedLocation){
@@ -72,8 +70,7 @@ router.route('/deleteLocation')
 // updates a location
 // Test Done
 // Read me
-router.route('/updateLocation')
-.post(async(req,res) => {
+router.route('/updateLocation').post(async(req,res) => {
     try {
         foundLocation = await locationModel.findOne({location : req.body.updates.location})
         if (foundLocation){
@@ -103,10 +100,10 @@ router.route('/updateLocation')
         res.send(error)
     }    
 })
+
 ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 /* Test Done, Read Me*/
-router.route('/addFaculty')
-.post(async (req,res) =>{
+router.route('/addFaculty').post(async (req,res) =>{
     try {
         const foundFaculty = await facultyModel.findOne({name : req.body.faculty})  
         if (foundFaculty)
@@ -125,8 +122,7 @@ router.route('/addFaculty')
 
 // Test Done
 // Read Me
-router.route('/deleteFaculty')
-.post(async (req,res) =>{
+router.route('/deleteFaculty').post(async (req,res) =>{
     try {
         const deletedFaculty = await facultyModel.findOneAndDelete({name : req.body.name})
         if (deletedFaculty){
@@ -142,8 +138,7 @@ router.route('/deleteFaculty')
 
 
 // Test Done, read Me
-router.route('/updateFaculty')
-.post(async (req,res) =>{
+router.route('/updateFaculty').post(async (req,res) =>{
     try {
         const prevFaculty = await facultyModel.findOneAndUpdate({name : req.body.name},req.body.updates)
         if (prevFaculty){
@@ -164,8 +159,7 @@ router.route('/updateFaculty')
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 // Test Done
 // Read Me
-router.route('/addDepartment')
-.post(async (req,res) =>{
+router.route('/addDepartment').post(async (req,res) =>{
     try {
         const foundFaculty = await facultyModel.findOne({name : req.body.faculty})
         if (!foundFaculty){
@@ -190,8 +184,7 @@ router.route('/addDepartment')
 })
 // Test Done
 // Read me
-router.route('/updateDepartment')
-.post(async (req,res) =>{
+router.route('/updateDepartment').post(async (req,res) =>{
     try {
         const foundFaculty = await facultyModel.findOne({name : req.body.facultyName , departments : [req.body.name]})
         if (foundFaculty){
@@ -220,8 +213,7 @@ router.route('/updateDepartment')
 
 // Test Done
 // Read me
-router.route('/deleteDepartment')
-.post(async (req,res)=>{
+router.route('/deleteDepartment').post(async (req,res)=>{
     try {
         const foundFaculty = await facultyModel.findOneAndUpdate({name : req.body.faculty} , 
             {$pull: {departments : req.body.department}},{ multi: true})                
@@ -257,8 +249,7 @@ router.route('/deleteDepartment')
     req.body.department -> name of the department where the course will be added
 */ 
 // Read Me
-router.route('/addCourse')
-.post(async (req,res) => {
+router.route('/addCourse').post(async (req,res) => {
     try {
         const foundCourse = await courseModel.findOne({name : req.body.name})
         const foundDepartment =  await departmentModel.findOne({name : req.body.department})  
@@ -282,8 +273,7 @@ router.route('/addCourse')
     }
 })
 // Read me
-router.route('/updateCourse')
-.post(async (req,res) => {
+router.route('/updateCourse').post(async (req,res) => {
     try {
        const foundDepartment = await departmentModel.find({name : req.body.departmentName , courses : [req.body.courseName]})
        if (foundDepartment){
@@ -311,8 +301,7 @@ router.route('/updateCourse')
 */
 
 // Read Me
-router.route('/deleteCourse')
-.post(async (req,res)=>{
+router.route('/deleteCourse').post(async (req,res)=>{
     try {
         await departmentModel.update({name : req.body.department} , {$pull: {courses : req.body.course}},{ multi: true})
         const staffMembers = await staffModel.find({department : req.body.department}, {id : 1,_id : 0}).map(function (staff) {
@@ -357,8 +346,7 @@ router.route('/updateSalary')
 /*
 Read Me
 */ 
-router.route('/viewAttendance')
-.get(async (req,res) =>{
+router.route('/viewAttendance').get(async (req,res) =>{
     try {
         const staff = await staffModel.findOne({id : req.body.id})
         if (staff){
@@ -374,8 +362,7 @@ router.route('/viewAttendance')
 /*
 Read Me Done
 */
-router.route('/addAttendance')
-.post(async (req,res) => {
+router.route('/addAttendance').post(async (req,res) => {
     if (req.body.id.localeCompare(req.user.id)==0){
         res.send("Sorry, you are not allowed to update your own Attendance!")
     }
@@ -402,141 +389,136 @@ router.route('/addAttendance')
     }
 })
 
-function getStartEndDates() {
-    const currentDate = new Date();
-    const currentDay = currentDate.getDate();
-    const currentMonth = currentDate.getMonth();
-    const currentYear = currentDate.getFullYear();
-    let startDay = 11;
-    let startMonth;
-    let startYear;
-    let endDay = 10;
-    let endMonth;
-    let endYear;
-    if (currentDay >= 11){
-        startMonth = currentMonth
-        startYear = currentYear
-        if (startMonth == 11){
-   	    	endMonth = 0
-        	endYear = currentYear + 1
-        }
-        else {
-   	  	    endMonth = currentMonth + 1
-      	    endYear = currentYear
-        }
-    }
-    else {
-	    endYear = currentYear
-  	    endMonth = currentMonth
-  	    if (endMonth == 0){
-    	    startMonth = 11
-      	    startYear = currentYear - 1
-        }
-  	    else {
-    	    startMonth = currentMonth - 1
-      	    startYear = currentYear
-        }
-    }
-    return {
-        startDate : new Date(startYear,startMonth,startDay,2,0,0),
-        endDate : new Date(endYear,endMonth,endDay,2,0,0)
-    }
-}
+// function getStartEndDates() {
+//     const currentDate = new Date();
+//     const currentDay = currentDate.getDate();
+//     const currentMonth = currentDate.getMonth();
+//     const currentYear = currentDate.getFullYear();
+//     let startDay = 11;
+//     let startMonth;
+//     let startYear;
+//     let endDay = 10;
+//     let endMonth;
+//     let endYear;
+//     if (currentDay >= 11){
+//         startMonth = currentMonth
+//         startYear = currentYear
+//         if (startMonth == 11){
+//    	    	endMonth = 0
+//         	endYear = currentYear + 1
+//         }
+//         else {
+//    	  	    endMonth = currentMonth + 1
+//       	    endYear = currentYear
+//         }
+//     }
+//     else {
+// 	    endYear = currentYear
+//   	    endMonth = currentMonth
+//   	    if (endMonth == 0){
+//     	    startMonth = 11
+//       	    startYear = currentYear - 1
+//         }
+//   	    else {
+//     	    startMonth = currentMonth - 1
+//       	    startYear = currentYear
+//         }
+//     }
+//     return {
+//         startDate : new Date(startYear,startMonth,startDay,2,0,0),
+//         endDate : new Date(endYear,endMonth,endDay,2,0,0)
+//     }
+// }
 
-// return 1 -> date_One > date_Two , 0 -> date_One = date_Two, -1 -> date_One < date_Two
-function compareDates(date_One,date_Two){
-    if (date_One.getFullYear() > date_Two.getFullYear())
-        return 1;
-    else if (date_One.getFullYear() < date_Two.getFullYear())
-        return -1;    
-    else{
-        if (date_One.getMonth() > date_Two.getMonth())
-            return 1;
-        else if (date_One.getMonth() < date_Two.getMonth())
-            return -1;
-        else {
-            if (date_One.getDate() > date_Two.getDate())
-                return 1;
-            else if (date_One.getDate() < date_Two.getDate())
-                return -1;
-            else
-                return 0;        
-        }        
-    }    
-}
+// // return 1 -> date_One > date_Two , 0 -> date_One = date_Two, -1 -> date_One < date_Two
+// function compareDates(date_One,date_Two){
+//     if (date_One.getFullYear() > date_Two.getFullYear())
+//         return 1;
+//     else if (date_One.getFullYear() < date_Two.getFullYear())
+//         return -1;    
+//     else{
+//         if (date_One.getMonth() > date_Two.getMonth())
+//             return 1;
+//         else if (date_One.getMonth() < date_Two.getMonth())
+//             return -1;
+//         else {
+//             if (date_One.getDate() > date_Two.getDate())
+//                 return 1;
+//             else if (date_One.getDate() < date_Two.getDate())
+//                 return -1;
+//             else
+//                 return 0;        
+//         }        
+//     }    
+// }
 
-function missingDays_missingHours_extraHours(records, leaves, dayOff, startDate, endDate){
-    let missingDays = [];
-    let dEnd, dayAttendance, dayLeaves, dayWeek, signIn, signOut;
-    let foundSignOut = false , attended = false;
-    let attendanceTime = 0 ,missingHours = 0, extraHours = 0;
-    let compensationDates = leaves.map(function (leave) {
-        if (leave.type == "Compensation Leaves"){
-            return leave.compensationDate
-        }
-    })
-    for (dStart = new Date(startDate) ; dStart <= endDate; dStart.setDate(dStart.getDate() + 1)) {
-        dEnd = new Date(dStart)
-        dEnd.setHours(25,59,59)
-        // dStart.setHours(3,0,0)
-        dayWeek = dStart.getDay() // 0 -> sunday , 6 -> saturday
-        dayAttendance = records.filter(function (record) {
-            // return record.date.getTime() >= dStart.getTime() && record.date.getTime() <= dEnd.getTime()
-            return (compareDates(record.date,dStart) == 0)            
-        })
-        dayLeaves = leaves.filter(function (leave) {
-            // return dStart.getTime() >= leave.startDate.getTime() && dStart.getTime() < leave.endDate.getTime()
-            return (compareDates(dStart,leave.startDate) >= 0 && compareDates(dStart,leave.endDate) >= 0)
-        })
+// function missingDays_missingHours_extraHours(records, leaves, dayOff, startDate, endDate){
+//     let missingDays = [];
+//     let dayAttendance, dayLeaves, dayWeek, signIn, signOut;
+//     let foundSignOut = false , attended = false;
+//     let attendanceTime = 0 ,missingHours = 0, extraHours = 0;
+//     let compensationDates = leaves.map(function (leave) {
+//         if (leave.type == "Compensation Leaves"){
+//             return leave.compensationDate
+//         }
+//     })
+//     for (dStart = new Date(startDate) ; dStart <= endDate; dStart.setDate(dStart.getDate() + 1)) {
+//         dayWeek = dStart.getDay() // 0 -> sunday , 6 -> saturday
+//         dayAttendance = records.filter(function (record) {
+//             return (compareDates(record.date,dStart) == 0)            
+//         })
+//         dayLeaves = leaves.filter(function (leave) {
+//             return (compareDates(dStart,leave.startDate) >= 0 && compareDates(dStart,leave.endDate) <= 0)
+//         })
 
-        for (let i = dayAttendance.length -1 ; i >= 0 ; i--){
-            if (dayAttendance[i].type.localeCompare("signOut") == 0){
-                foundSignOut = true;
-                signOut = dayAttendance[i].date; 
-            }
-            if (foundSignOut && dayAttendance[i].type.localeCompare("signIn") == 0){
-                signIn = dayAttendance[i].date;
-                foundSignOut = false;
-                attended = true;
-                attendanceTime = signOut.getTime() - signIn.getTime();
-                attendanceTime /= 60000
-                if (dayWeek == dayOff 
-                    && !compensationDates.map(function (leave){
-                        // return leave.getTime() == dStart.getTime()
-                        return compareDates(leave,dStart) == 0
-                    })){
-                    missingHours -= attendanceTime
-                }
-                else
-                    missingHours += (504 - attendanceTime) 
-            }
-        }
-        if (!attended && dayWeek != 5 && dayWeek != dayOff && dayLeaves.length == 0){
-            missingDays.push(new Date(dStart))
-        }
-        foundSignOut = false;
-        attended = false;
-        signIn = null;
-        signOut = null;
-        attendanceTime = 0;             
-    }  
-    if (missingHours < 0){
-        extraHours = (missingHours * -1)
-        missingHours = 0
-    }
-    return {missingDays : missingDays , missingHours : missingHours , extraHours : extraHours}  
-}
+//         for (let i = dayAttendance.length -1 ; i >= 0 ; i--){
+//             if (dayAttendance[i].type.localeCompare("signOut") == 0){
+//                 foundSignOut = true;
+//                 signOut = dayAttendance[i].date; 
+//             }
+//             if (foundSignOut && dayAttendance[i].type.localeCompare("signIn") == 0){
+//                 signIn = dayAttendance[i].date;
+//                 foundSignOut = false;
+//                 attended = true;
+//                 attendanceTime = signOut.getTime() - signIn.getTime();
+//                 attendanceTime /= 60000
+//                 if (dayWeek == dayOff 
+//                     && !compensationDates.map(function (leave){
+//                         return compareDates(leave,dStart) == 0
+//                     })){
+//                     missingHours -= attendanceTime
+//                 }
+//                 else
+//                     missingHours += (504 - attendanceTime) 
+//             }
+//         }
+//         if (!attended && dayWeek != 5 && dayWeek != dayOff && dayLeaves.length == 0){
+//             missingDays.push(new Date(dStart))
+//         }
+//         foundSignOut = false;
+//         attended = false;
+//         signIn = null;
+//         signOut = null;
+//         attendanceTime = 0;             
+//     }  
+//     if (missingHours < 0){
+//         extraHours = (missingHours * -1)
+//         missingHours = 0
+//     }
+//     return {missingDays : missingDays , missingHours : missingHours , extraHours : extraHours}  
+// }
 
-router.route('/viewMissingDaysHours')
-.get(async (req,res) =>{
+router.route('/viewMissingDaysHours').get(async (req,res) =>{
     try {
         let output = [];
         let missingDaysHours;
-        let startEndDates = getStartEndDates()
+        // let startEndDates = getStartEndDates()
+        let startEndDates = functions.getStartEndDates()
         const staffMembersRecords = (await staffModel.find({},{id : 1, attendanceRecords : 1, name : 1, dayOff : 1, _id : 0})).map(function (member){
             member.attendanceRecords = member.attendanceRecords.filter(function (record) {
                 // return (record.date.getTime() >= startEndDates.startDate.getTime() && record.date.getTime() < startEndDates.endDate.getTime())
-                return (compareDates(record.date,startEndDates.startDate) >=0 &&  compareDates(record.date,startEndDates.endDate) <=0)
+                // return (compareDates(record.date,startEndDates.startDate) >=0 &&  compareDates(record.date,startEndDates.endDate) <=0)
+                return (functions.compareDates(record.date,startEndDates.startDate) >=0 &&  functions.compareDates(record.date,startEndDates.endDate) <=0)
             })
             return member;
         })
@@ -546,7 +528,9 @@ router.route('/viewMissingDaysHours')
                 type : {$in : ['Annual Leaves', 'Sick Leaves', 'Accidental Leaves', 'Maternity Leaves', 'Compensation Leaves']},
                 status : "Accepted"
             })
-            missingDaysHours = missingDays_missingHours_extraHours(staffMembersRecords[i].attendanceRecords,leavesRecords,staffMembersRecords[i].dayOff,startEndDates.startDate,startEndDates.endDate)
+            console.log(leavesRecords)
+            // missingDaysHours = missingDays_missingHours_extraHours(staffMembersRecords[i].attendanceRecords,leavesRecords,staffMembersRecords[i].dayOff,startEndDates.startDate,startEndDates.endDate)
+            missingDaysHours = functions.missingDays_missingHours_extraHours(staffMembersRecords[i].attendanceRecords,leavesRecords,staffMembersRecords[i].dayOff,startEndDates.startDate,startEndDates.endDate)
             if (missingDaysHours.missingDays.length > 0 || missingDaysHours.missingHours > 0){
                 output.push(({id : staffMembersRecords[i].id, name : staffMembersRecords[i].name, missingDays : missingDaysHours.missingDays,
                      missingHours : missingDaysHours.missingHours , extraHours :missingDaysHours.extraHours}))
@@ -560,8 +544,7 @@ router.route('/viewMissingDaysHours')
         
 /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 /*Read Me*/ 
-router.route('/registerStaff')
-.post(async (req,res) =>{
+router.route('/registerStaff').post(async (req,res) =>{
     try {
         if (req.body.name && req.body.salary  && req.body.office && req.body.dayOff && req.body.role){
             const foundDepartment = await departmentModel.findOne({name : req.body.department})
@@ -622,8 +605,7 @@ router.route('/registerStaff')
 })
 
 /* Read Me Done */
-router.route('/updateStaffMember')
-.post(async (req,res)=> {
+router.route('/updateStaffMember').post(async (req,res)=> {
     try {
         if (req.body.updates){
             if (req.body.updates.faculty){
@@ -655,8 +637,7 @@ router.route('/updateStaffMember')
 })
 
 /* Read Me Done */
-router.route('/deleteStaffMember')
-.post(async (req,res) => {
+router.route('/deleteStaffMember').post(async (req,res) => {
     try { 
         const member = await staffModel.findOneAndDelete({id : req.body.staffMember})
         await scheduleModel.updateMany({academicMember : req.body.staffMember} , {academicMember : null})
@@ -669,7 +650,7 @@ router.route('/deleteStaffMember')
             {sender : req.body.staffMember},
             {receiver : req.body.staffMember}]})
         await locationModel.findOneAndUpdate({location : member.office},{$inc : {currentCapacity : - 1}})
-        await departmentModel.findOneAndUpdate({HOD : member.id},{HOD : null})        
+        await departmentModel.updateMany({HOD : member.id},{HOD : null})        
         res.send(`Staff member ${member.name} deleted successfully!`)
     } catch (error) {
         res.send(error)
