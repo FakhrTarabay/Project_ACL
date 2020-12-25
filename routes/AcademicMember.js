@@ -15,7 +15,7 @@ require('dotenv').config()
 router.use(async (req, res, next) => {
     try {
         const role = req.user.role
-        if (role.includes("Academic Member")) {
+        if (role.includes("TA")) {
             next();
         }
     } catch (error) {
@@ -23,14 +23,14 @@ router.use(async (req, res, next) => {
         res.end();
     }
 })
-router.route('/viewSchedule').post(async (req, res) => {
+router.route('/viewSchedule').get(async (req, res) => {
     try {
         const schedule = await scheduleModel.find({ academicMember: req.user.id })
-        const startEndDates = getStartEndDates()
+        const startEndDates = functions.getStartEndDates()
         const startDate = startEndDates.startDate
         const endDate = startEndDates.endDate
         const replacementRequests = (await requestModel.find({ receiver: req.user.id, status: 'Accepted' })).filter(function (request) {
-            return (compareDates(startDate, request.startDate) <= 0 && compareDates(endDate, request.startDate) >= 0)
+            return (functions.compareDates(startDate, request.startDate) <= 0 && functions.compareDates(endDate, request.startDate) >= 0)
         })
         let replacedSlots = []
         for (let i = 0; i < replacementRequests.length; i++) {
@@ -84,11 +84,11 @@ router.route('/slotLinking').post(async (req, res) => {
     }
 })
 
-router.route('/viewReplacmentRequest').get(async (req, res) => {
+router.route('/viewReplacementRequest').get(async (req, res) => {
     try {
-        const request_sender = await requsetModel.find({ type: 'Replacment', sender: req.user.id })
-        const req_reciver = await requsetModel.find({ type: 'Replacment', receiver: req.user.id })
-        res.send({ sent_requests: request_sender, recvived_requests: req_reciver })
+        const request_sender = await requestModel.find({ type: 'Replacement', sender: req.user.id })
+        const req_reciver = await requestModel.find({ type: 'Replacement', receiver: req.user.id })
+        res.send({ sent_requests: request_sender, received_requests: req_reciver })
 
     } catch (error) {
         res.send(error)
@@ -97,47 +97,56 @@ router.route('/viewReplacmentRequest').get(async (req, res) => {
 
 router.route('/SendRequest').post(async (req, res) => {
     try {
+        console.log(1)
         const member = await staffModel.findOne({ id: req.user.id })
+        console.log(2)
         const department = member.department
+        console.log(3)
         const hod = (await departmentModel.findOne({ name: department })).HOD
         let startDate, endDate
+        console.log(req.body.startDate)
         if (req.body.startDate)
-            startDate = (new Date(req.body.startDate)).setHours(2, 0, 0)
+            startDate = new Date(req.body.startDate)
         if (req.body.endDate)
-            endDate = (new Date(req.body.endDate)).setHours(2, 0, 0)
+            endDate = new Date(req.body.endDate)
+        console.log(endDate)
         if (req.body.type == 'Annual Leaves') {
             if (member.annualLeaves < 1) {
+                console.log(member.annualLeaves)
                 res.send("you annual balance is insufficient")
             }
             else {
-                const sched = await scheduleModel.find({ academicMember: req.user.id, day: req.body.startDate.getDay() });
+                console.log(4)
+                const sched = await scheduleModel.find({ academicMember: req.user.id, day: startDate.getDay() });
+                console.log(5)
                 if (sched.length != 0 && department) {
-                    const request = new requsetModel({
+                    const request = new requestModel({
                         type: 'Annual Leaves',
                         sender: req.user.id,
                         receiver: hod,
                         requestDate: (new Date()).setHours(2, 0, 0),
                         status: 'Pending',
                         startDate: startDate,
-                        endDate: endDate,
-                        comment: req.body.comment
+                        endDate: endDate
                     })
+                    console.log(12)
                     await request.save();
                     res.send("Request sent with success!")
+                    res.end()
                 }
                 else {
-                    const foundReplacments = (await requsetModel.find({
+                    const foundReplacments = (await requestModel.find({
                         sender: req.user.id,
                         type: 'Replacement',
                         status: 'Accepted'
                     })).filter(function (request) {
-                        return compareDates(startDate, request.startDate) == 0
+                        return functions.compareDates(startDate, request.startDate) == 0
                     })
                     const receivers = foundReplacments.map(function (request) {
                         return request.receiver
                     })
                     // if (foundReplacments.length == sched.length) {
-                    const request = new requsetModel({
+                    const request = new requestModel({
                         type: 'Annual Leaves',
                         sender: req.user.id,
                         receiver: hod,
@@ -149,16 +158,17 @@ router.route('/SendRequest').post(async (req, res) => {
                     })
                     await request.save();
                     res.send("Request sent with success!")
+                    res.end()
                     // } 
                 }
             }
         }
-        if (req.body.type == 'Accidental Leaves') {
+        else if (req.body.type == 'Accidental Leaves') {
             if ((member.accidentalLeaves == 0) || (member.annualLeaves < 1)) {
                 res.send("Maximum accidental Leaves reached")
             }
             else {
-                const request = new requsetModel({
+                const request = new requestModel({
                     type: 'Accidental Leaves',
                     sender: req.user.id,
                     receiver: hod,
@@ -173,12 +183,12 @@ router.route('/SendRequest').post(async (req, res) => {
             }
 
         }
-
-        if (req.body.type == 'Sick Leaves') {
-            if ((req.body.requestDate.getDate() - (new Date()).setHours(2, 0, 0).getDate()) > 3) {
+        else if (req.body.type == 'Sick Leaves') {
+            const requestDate = new Date()
+            if (requestDate.getDate() - startDate.getDate() > 3) {
                 res.send("Invalid Request")
             } else {
-                const request = new requsetModel({
+                const request = new requestModel({
                     type: 'Sick Leaves',
                     sender: req.user.id,
                     receiver: hod,
@@ -192,12 +202,11 @@ router.route('/SendRequest').post(async (req, res) => {
                 res.send("Request sent with success!")
             }
         }
-
-        if (req.body.type == 'Maternity Leaves') {
+        else if (req.body.type == 'Maternity Leaves') {
             if (member.gender == 'Male') {
                 res.send("Invalid Request")
             } else {
-                const request = new requsetModel({
+                const request = new requestModel({
                     type: 'Maternity Leaves',
                     sender: req.user.id,
                     receiver: hod,
@@ -211,16 +220,19 @@ router.route('/SendRequest').post(async (req, res) => {
                 res.send("Request sent with success!")
             }
         }
-
-        if (req.body.type == 'Compensation Leaves') {
-            const dates = getStartEndDates();
+        else if (req.body.type == 'Compensation Leaves') {
+            const dates = functions.getStartEndDates();
             const Startmonth = dates.startDate;
             const Endmonth = dates.endDate;
-            if (compareDates(startDate, Startmonth) == 1 && compareDates(startDate, Endmonth) == -1
-                && compareDates(req.body.compensationDate, Startmonth) == 1 && compareDates(req.body.compensationDate, Endmonth) == -1) {
-                const foundCompensation = functions.foundAttendaceRecord(member.attendanceRecords, req.compensationDate)
+            const compensationDate = new Date(req.body.compensationDate)
+            compensationDate.setHours(2,0,0)
+            console.log(req.body.compensationDate)
+            if (functions.compareDates(startDate, Startmonth) >= 0 && functions.compareDates(startDate, Endmonth) <= 0
+                && functions.compareDates(compensationDate, Startmonth) >= 0 && functions.compareDates(compensationDate, Endmonth) <= 0) {
+                console.log(12)    
+                const foundCompensation = functions.foundAttendaceRecord(member.attendanceRecords, compensationDate)
                 if (foundCompensation) {
-                    const request = new requsetModel({
+                    const request = new requestModel({
                         type: 'Compensation Leaves',
                         sender: req.user.id,
                         receiver: hod,
@@ -228,50 +240,51 @@ router.route('/SendRequest').post(async (req, res) => {
                         status: 'Pending',
                         startDate: startDate,
                         endDate: endDate,
-                        compensationDate: (new Date(req.body.compensationDate)).setHours(2, 0, 0)
+                        compensationDate: compensationDate
                     })
                     await request.save();
                     res.send("Request sent with success!")
-
-                } else {
+                }
+                 else {
                     res.send('invalid compensation request')
                 }
+            
             }
-        } else {
-            res.send('invalid compensation request')
-        }
+        } 
 
-
-        if (req.body.type == 'Change dayoff') {
-            const request = new requsetModel({
+        else if (req.body.type == 'Change dayoff') {
+            if(req.body.newDayOff == 5){
+                res.send("You cannot choose Friday as your dayoff!")
+            }
+            else{
+                const request = new requestModel({
                 type: 'Change dayoff',
                 sender: req.user.id,
                 receiver: hod,
                 requestDate: (new Date()).setHours(2, 0, 0),
                 status: 'Pending',
                 changedDayOff: req.body.newDayOff
-            })
-            await request.save();
-            res.send("Request sent with success!")
+                })
+                await request.save();
+                res.send("Request sent with success!")
+            }
         }
 
-        if (req.body.type == 'Replacement') {
+        else if (req.body.type == 'Replacement') {
             const slot = await scheduleModel.findOne({ _id: req.body.slot })
             if (slot) {
                 const Course = await courseModel.findOne({ name: slot.course })
                 const receiver = await staffModel.findOne({ id: req.body.receiver })
-
                 if (receiver && receiver.department == department &&
                     (Course.TAs.includes(req.body.receiver) || Course.coordinator == req.body.receiver)) {
                     if (startDate.getDay() == slot.day) {
-                        const request = new requsetModel({
+                        const request = new requestModel({
                             type: 'Replacement',
                             sender: req.user.id,
                             receiver: req.body.receiver,
                             requestDate: (new Date()).setHours(2, 0, 0),
                             startDate: startDate,
                             status: 'Pending',
-                            comment: req.body.comment,
                             schedule_ID: req.body.slot
 
                         })
@@ -291,15 +304,21 @@ router.route('/SendRequest').post(async (req, res) => {
         }
         else
             res.send("there is an error sending your request")
-    } catch (error) {
-        res.send(error)
+    } 
+    catch (error) {
+        res.send("Invalid Date")
     }
 })
 
 router.route('/ViewRequest').get(async (req, res) => {
     try {
-        const request = await requsetModel.find({ sender: req.body.sender, type: req.body.type })
-        res.send(request)
+        if(req.body.status){
+            const request = await requestModel.find({sender:req.user.id, status: req.body.status})
+            res.send(request)
+        }
+        else {
+            res.send(await requestModel.find({sender:req.user.id}))
+        }
     } catch (error) {
         res.send(error)
     }
@@ -307,14 +326,25 @@ router.route('/ViewRequest').get(async (req, res) => {
 
 router.route('/CancelRequest').post(async (req, res) => {
     try {
-        const request = await requsetModel.findOne({ _id: req.body._id })
+        console.log(111)
+        const request = await requestModel.findOne({ _id: req.body._id })
+        console.log(request)
         if (request) {
-            if (request.status == 'Pending' && (compareDates(request.startDate, (new Date()).setHours(2, 0, 0)) == 1)) {
-                await requsetModel.deleteOne({ _id: request._id })
+            if (request.status == 'Pending' || request.status == 'Rejected') {
+                console.log(11)
+                await requestModel.deleteOne({ _id: request._id })
+                res.send("Request deleted successfully!")
+            }
+            else if (request.status == 'Accepted' && (functions.compareDates(request.startDate, (new Date()).setHours(2, 0, 0)) == 1)){
+                if (request.type == 'Annual Leaves')
+                    await staffModel.findOneAndUpdate({id : req.user.id}, {$inc : {annualLeaves : 1}})
+                else if (request.type == 'Accidental Leaves') 
+                    await staffModel.findOneAndUpdate({id : req.user.id}, {$inc : {annualLeaves : 1, accidentalLeaves : 1}})
+                await requestModel.deleteOne({ _id: request._id })
                 res.send("Request deleted successfully!")
             }
             else {
-                res.send("Can't cancel a non pending request")
+                res.send("you can't cancel this request!")
             }
         } else {
             res.send("Can't find request")
@@ -324,3 +354,5 @@ router.route('/CancelRequest').post(async (req, res) => {
         res.send(error)
     }
 })
+
+module.exports = router
