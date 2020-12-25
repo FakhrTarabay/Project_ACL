@@ -1,3 +1,16 @@
+const mongoose = require('mongoose')
+mongoose.set('useFindAndModify', false)
+const express = require('express')
+const router = express.Router()
+const staffModel = require('../models/StaffMember')
+const scheduleModel = require('../models/Schedule')
+const departmentModel = require('../models/department')
+const courseModel = require('../models/course')
+const requestModel = require('../models/Request')
+const jwt = require('jsonwebtoken') 
+const functions = require('./functions')
+require('dotenv').config()
+
 ////////////////////////////////////////////ACADEMIC MEMBER////////////////////////////////////////////////////////////////////////////////////////////
 router.use(async (req, res, next) => {
     try {
@@ -81,21 +94,6 @@ router.route('/viewReplacmentRequest').get(async (req, res) => {
         res.send(error)
     }
 })
-
-function foundAttendaceRecord(records, date) {
-    let dayAttendance = records.filter(function (record) {
-        return (compareDates(record.date, date) == 0)
-    })
-    let foundSignOut = false
-    for (let i = dayAttendance.length - 1; i >= 0; i--) {
-        if (dayAttendance[i].type.localeCompare("signOut") == 0) {
-            foundSignOut = true;
-        }
-        if (foundSignOut && dayAttendance[i].type.localeCompare("signIn") == 0) {
-            return true;
-        }
-    }
-}
 
 router.route('/SendRequest').post(async (req, res) => {
     try {
@@ -220,7 +218,7 @@ router.route('/SendRequest').post(async (req, res) => {
             const Endmonth = dates.endDate;
             if (compareDates(startDate, Startmonth) == 1 && compareDates(startDate, Endmonth) == -1
                 && compareDates(req.body.compensationDate, Startmonth) == 1 && compareDates(req.body.compensationDate, Endmonth) == -1) {
-                const foundCompensation = foundAttendaceRecord(member.attendanceRecords, req.compensationDate)
+                const foundCompensation = functions.foundAttendaceRecord(member.attendanceRecords, req.compensationDate)
                 if (foundCompensation) {
                     const request = new requsetModel({
                         type: 'Compensation Leaves',
