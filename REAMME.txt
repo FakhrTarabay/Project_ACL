@@ -1,0 +1,1222 @@
+•	Functionality: log in to the system 
+Route: /login 
+Request type: POST 
+Request body: {“email”: “rawan.elkhouly@staff.guc.edu.eg”, “password”: “rawan”}
+
+•	Functionality: sign into the system 
+Route: /signIn 
+Request type: POST  
+Request body: { }
+
+•	Functionality: sign out of the system 
+Route: /signout
+Request type: POST  
+Request body: { }
+
+•	Functionality: log out of the system 
+Route: /logout
+Request type: POST  
+Request body: { }
+
+•	Functionality: view the profile of the logged in staff member
+Route: /viewProfile
+Request type: GET 
+Parameters: it takes the id from the token
+Response: Staff record. {
+    "role": [
+        "HR"
+    ],"annualLeaves": 0,"accidentalLeaves": 6,"loggedInBefore": true,
+    "email": "roro.hr-1@staff.guc.edu.eg","id": "hr-1","name": "roro","salary": 1500,
+    "dayOff": 6,"office": null,"attendanceRecords": [],"__v": 0,"extraInfo": {
+        								"nickname": "roro",
+        								"gender": "female"
+    											}
+}
+
+•	Functionality: update the password of the logged in staff member 
+Route: /updatePassword
+Request type: POST  
+Request body: { “password”: “roro1”}
+
+
+
+
+
+•	Functionality: update logged in staff member info 
+Route: /updateMyInfo
+Request type: POST  
+Request body: { “updates”: {
+“email” : “rawan.elkhouly”,
+“office” : “C7-220”,
+“extraInfo” : { 
+“nickname” : “roro”,
+“gender” : “female”}
+			}
+}
+•	Functionality: view the attendance of the logged in staff member and choose a preferred a month
+Route: /viewAttendance
+Request type: GET 
+Request body: {“month” : 12}
+Response: Attendance records [{
+        			"_id": "5fe015f9c89eae289c594fd6",
+        			"date": "2020-12-16T07:00:00.000Z",
+        			"type": "signIn"
+    				},
+    				{
+        			"_id": "5fe015f9c89eae289c594fd7",
+        			"date": "2020-12-16T19:00:00.000Z",
+        			"type": "signOut"
+    				}]
+
+•	Functionality: view the attendance of the logged in staff member and choose a preferred a month
+Route: /viewMissingDays
+Request type: GET 
+Request body: {}
+Response: [{
+        "id": "ac-1",
+        "name": "adham",
+        "missingDays": [
+            "2020-12-12T00:00:00.000Z",
+            "2020-12-14T00:00:00.000Z",
+            "2020-12-15T00:00:00.000Z",
+            "2020-12-16T00:00:00.000Z",
+            "2020-12-17T00:00:00.000Z",
+            "2020-12-19T00:00:00.000Z",
+            "2020-12-21T00:00:00.000Z",
+            "2020-12-22T00:00:00.000Z",
+            "2020-12-23T00:00:00.000Z",
+            "2020-12-24T00:00:00.000Z",
+            "2020-12-26T00:00:00.000Z",
+            "2020-12-28T00:00:00.000Z",
+            "2020-12-29T00:00:00.000Z",
+            "2020-12-30T00:00:00.000Z",
+            "2020-12-31T00:00:00.000Z",
+            "2021-01-02T00:00:00.000Z",
+            "2021-01-04T00:00:00.000Z",
+            "2021-01-05T00:00:00.000Z",
+            "2021-01-06T00:00:00.000Z",
+            "2021-01-07T00:00:00.000Z",
+            "2021-01-09T00:00:00.000Z"
+        ]
+    }
+]
+
+
+•	Functionality: view the attendance of the logged in staff member and choose a preferred a month
+Route: /viewMissingExtraHours
+Request type: GET 
+Request body: {}
+Response: [{
+        "id": "ac-1",
+        "name": "adham",
+        "missingHours": 0,
+        "extraHours": 0
+    	}]
+
+
+
+--------------------------------------------
+
+
+
+# Functionality: Add faculty in the System
+	- Route: /HR/addFaculty
+	- Request type: POST
+	- Request body: {
+		"faculty" : "MET"
+	}
+
+# Functionality: Add department in the System
+	- Route: /HR/addDepartment
+	- Request type: POST
+	- Request body: {
+		"faculty" : "MET"
+		"name" : "Computer Science"
+	}
+
+# Functionality: Add Course to the system
+	- Route: /HR/addCourse
+	- Request type: POST
+	- Request body: {
+ 		"name" : "CSEN704",
+    	"department" : "Computer Science"
+	}
+
+# Functionality: Add location to the system
+	- Route: /HR/addLocation
+	- Request type: POST
+	- Request body: {
+    	"location" : "C7-201",
+    	"type" : "Office",
+    	"maxCapacity" : 3
+		}
+
+# Functionality: Register Staff member
+	- Route: /HR/registerStaff
+	- Request type: POST
+	- Request body: {
+    	"name" : "TA_1",
+    	"salary" : 10000,
+    	"role" : ["TA"],
+    	"dayOff" : 3, 
+    	"faculty" : "MET",
+    	"department" : "Computer Science",
+    	"office" : "C7-220"
+	}
+
+# Functionality: Update Staffmember
+	- Route: /HR/updateStaffMember
+	- Request type: POST
+	- Request body: {
+   		"id" : "ac-2",
+    	"updates" : {
+        	"faculty" : "MET",
+        	"department" : "CS"
+    	}
+	}
+
+# Functionality: Update Location
+	- Route: /HR/updateLocation
+	- Request type: POST
+	- Request body: {
+ 	   "location" : "C7-201",
+    	"updates" : {
+        	"location" : "C7-209",
+        	"type" : "Lab",
+        	"maxCapacity" : 25
+    }
+}
+
+# Functionality: Update Faculty
+	- Route: /HR/updateFaculty
+	- Request type: POST
+	- Request body: {
+ 	   "name" : "MET",
+    	"updates" : {
+        	"name" : "Media"
+    	}
+	}
+
+# Functionality: Update department under a faculty
+	- Route: /HR/updateDepartment
+	- Request type: POST
+	- Request body: {
+  	 	"facultyName" : "MET",
+    	"name" : "ComputerScience",
+    	"updates" : {
+        	"name" : "CS",
+        	"HOD" : "ac-1"
+    	}
+	}
+
+# Functionality: Update Course under a department
+	- Route: /HR/updateCourse
+	- Request type: POST
+	- Request body: {
+  	 	"courseName" : "CSEN704",
+    	"departmentName" : "Computer Science"
+    	"updates" : {
+        	"name" : "CSEN701"
+    	}
+	}
+
+# Functionality: Update Salary
+	- Route: /HR/updateSalary
+	- Request type: POST
+	- Request body: {"id" : "hr-1", "salary" : 1000}
+
+
+# Functionality: Delete location from the system
+	- Route: /HR/deleteLocation
+	- Request type: POST
+	- Request body: {
+    	"location" : "C7-201"
+		}
+
+# Functionality: Deletes Faculty from the system
+	- Route: /HR/deleteFaculty
+	- Request type: POST
+	- Request body: {
+    	"name" : "MET"
+	}
+
+# Functionality: Deletes Department under a Faculty from the system
+	- Route: /HR/deleteDepartment
+	- Request type: POST
+	- Request body: {
+ 	   "faculty" : "MET",
+ 	   "department" : "Computer Science"
+	}
+
+# Functionality: Deletes Course under a Department from the system
+	- Route: /HR/deleteCourse
+	- Request type: POST
+	- Request body: {
+ 	   "course" : "CSEN704",
+ 	   "department" : "Computer Science"
+	}
+
+# Functionality: Delete Staffmember
+	- Route: /HR/deleteStaffMember
+	- Request type: POST
+	- Request body: {"staffMember" : "hr-1"}
+
+
+# Functionality: Add Attendance to a StaffMember
+	- Route: /HR/addAttendance
+	- Request type: POST
+	- Request body: 
+	{
+    	"id" : "hr-3",
+    	"newAttendanceRecords" : [
+ 	    	{
+           		"date" : "Dec 12 2020 12:00:00",
+       	    	"type" : "singIn"
+       		},
+       		{
+           		"date" : "Dec 13 2020 9:00:00",
+           		"type" : "singOut"
+       		},
+       		{
+          		"date" : "Dec 14 2020 10:00:00",
+           		"type" : "singOut"
+        	}
+  		]
+  	}
+
+# Functionality: view Attendance of a StaffMember
+	- Route: /HR/viewAttendance
+	- Request type: GET
+	- Request body: {"id" : "hr-3"}
+	- Response : Array of Records
+	- single Record :   {
+        "_id": "5fe4145e9f1e0a22dc26ec3b",
+        "date": "2020-12-24T07:00:00.353Z",
+        "type": "signIn"
+    }
+
+# Functionality: view Location
+	- Route: /HR/viewLocations
+	- Request type: GET
+	- Request body: {}
+	- Response : Array of Locations
+	- single Location :  {
+        "currentCapacity": 3,
+        "_id": "5fdfcb37bffb334918b10fdb",
+        "location": "C7-206",
+        "type": "Office",
+        "maxCapacity": 2,
+        "__v": 0
+    }
+    
+# Functionality: view Staff member with missing days/ missing Hours
+	- Route: /HR/viewMissingDaysHours
+	- Request type: GET
+	- Request body: {}
+	- Response : Array staff member's data with there  missing days and missing hours and extra hours
+	- single staffmember's data output :  
+	{
+        "id": "ac-3",
+        "name": "sam",
+        "missingDays": [
+            "2020-12-13T00:00:00.000Z",
+            "2020-12-14T00:00:00.000Z",
+            "2020-12-15T00:00:00.000Z",
+            "2020-12-17T00:00:00.000Z",
+            "2020-12-20T00:00:00.000Z",
+            "2020-12-23T00:00:00.000Z",
+            "2020-12-24T00:00:00.000Z",
+            "2020-12-27T00:00:00.000Z",
+            "2020-12-28T00:00:00.000Z",
+            "2020-12-29T00:00:00.000Z",
+            "2020-12-30T00:00:00.000Z",
+            "2020-12-31T00:00:00.000Z",
+            "2021-01-03T00:00:00.000Z",
+            "2021-01-04T00:00:00.000Z",
+            "2021-01-05T00:00:00.000Z",
+            "2021-01-06T00:00:00.000Z",
+            "2021-01-07T00:00:00.000Z",
+            "2021-01-10T00:00:00.000Z"
+        ],
+        "missingHours": 0,
+        "extraHours": 432,
+        "dayOff": 6
+    }
+
+
+
+
+
+--------------------------------
+HOD:-
+Function:  It is used to assign an instructor to a course within his department
+
+Route:/HOD/assignCourse
+
+Request type:POST
+
+Parameters: The id of the course we wanna assign the Instructor to it and the id of the instructor 
+
+Request body: {
+   "courseid":"1" ,
+   "staffid":"5" 
+    
+}
+
+Response : The instructor assigned successfully
+
+*********************************************************************************************************************************************************************************************************************************************
+
+2- Function: It is used to update instructors of the course within his department 
+
+Route:/HOD/updateCourseInstructors
+
+Request type:POST
+
+Parameters:The id of the course,The id of the staffmember ,the id of the instructor that is assigned to that course and would get updated with the id of the staffmember
+
+Request body:{
+   "courseid":"1" ,
+   "staffid":"7" ,
+   "updatedstaffid": "5"
+    
+}
+
+Response: The instructor updated successfully
+*************************************************************************************************************************************************************************************************************************************************
+
+
+3-Function: It is used to delete instrcutor of the course within his depatrment
+
+Route: /HOD/deleteCourseInstructors
+
+Request type:POST 
+
+Parameters:The id of the course,The id of the staffmember we wanna delete
+
+Request body:{
+   "courseid":"1" ,
+   "staffid":"7" 
+  
+}
+
+Response: The instructor was deleted successfully
+*********************************************************************************************************************************************************************************************************************************************
+4-Function:It is used to view the staff of his department
+
+Route: /HOD/viewStaffdepartment
+
+Request type:GET
+
+Parameters: The staff of his department that we would show their info 
+
+Response: [
+    {
+        "annualLeaves": 0,
+        "accidentalLeaves": 6,
+        "loggedInBefore": false,
+        "role": [
+            "HOD"
+        ],
+        "_id": "5fdbd8543a18b23ed0fca91c",
+        "name": "Ahmad",
+        "email": "adham@mail.com",
+        "id": "1",
+        "salary": 300,
+        "office": "c7.203",
+        "faculty": "Emgineering",
+        "department": "MET",
+        "attendanceRecords": [],
+        "dayOff": 0,
+        "__v": 0
+    },
+    {
+        "annualLeaves": 0,
+        "accidentalLeaves": 6,
+        "loggedInBefore": false,
+        "role": [
+            "Instructor",
+            "TA"
+        ],
+        "_id": "5fdc20ac20a8a840b0a34771",
+        "name": "fawzy",
+        "email": "fawzy@mail.com",
+        "id": "3",
+        "salary": 300,
+        "office": "c5.203",
+        "faculty": "Engineering",
+        "department": "MET",
+        "dayOff": 3,
+        "attendanceRecords": [],
+        "__v": 0
+    },
+    {
+        "annualLeaves": 0,
+        "accidentalLeaves": 6,
+        "loggedInBefore": false,
+        "role": [
+            "Instructor"
+        ],
+        "_id": "5fdc222fd66b703c04154faf",
+        "name": "nelly",
+        "email": "nellyy@mail.com",
+        "id": "5",
+        "salary": 50000,
+        "office": "c3.203",
+        "faculty": "Engineering",
+        "department": "MET",
+        "dayOff": 0,
+        "attendanceRecords": [],
+        "__v": 0
+    },
+    {
+        "annualLeaves": 0,
+        "accidentalLeaves": 6,
+        "loggedInBefore": false,
+        "role": [
+            "Instructor"
+        ],
+        "_id": "5fdc23a2d66b703c04154fb0",
+        "name": "noha",
+        "email": "noha@mail.com",
+        "id": "6",
+        "salary": 5000,
+        "office": "c1.203",
+        "faculty": "Engineering",
+        "department": "MET",
+        "dayOff": 1,
+        "attendanceRecords": [],
+        "__v": 0
+    },
+    {
+        "annualLeaves": 0,
+        "accidentalLeaves": 6,
+        "loggedInBefore": false,
+        "role": [
+            "Instructor",
+            "TA",
+            ""
+        ],
+        "_id": "5fdc244bd66b703c04154fb1",
+        "name": "medhat",
+        "email": "medhat@mail.com",
+        "id": "7",
+        "salary": 5000,
+        "office": "c0.203",
+        "faculty": "Engineering",
+        "department": "MET",
+        "dayOff": 4,
+        "attendanceRecords": [],
+        "__v": 0
+    },
+    {
+        "annualLeaves": 0,
+        "accidentalLeaves": 6,
+        "loggedInBefore": false,
+        "role": [
+            "TA"
+        ],
+        "_id": "5fdfe404c3697f029fd8ecec",
+        "name": "Marwa",
+        "email": "marwa@mail.com",
+        "id": "10",
+        "salary": 30000,
+        "office": "c5",
+        "faculty": "Engineering",
+        "department": "MET",
+        "dayOff": 5,
+        "attendanceRecords": []
+    }
+]
+*********************************************************************************************************************************************************************************************************************************************************
+Function: It is used to view the staff of the course within his department 
+
+Route: /HOD/viewCoursestaff
+
+Request Type: POST
+
+Request Body : {
+    "courseid":"1"
+}
+
+
+Request Response:[
+    {
+        "annualLeaves": 0,
+        "accidentalLeaves": 6,
+        "loggedInBefore": false,
+        "role": [
+            "Instructor"
+        ],
+        "_id": "5fdc23a2d66b703c04154fb0",
+        "name": "noha",
+        "email": "noha@mail.com",
+        "id": "6",
+        "salary": 5000,
+        "office": "c1.203",
+        "faculty": "Engineering",
+        "department": "MET",
+        "dayOff": 1,
+        "attendanceRecords": [],
+        "__v": 0
+    },
+    {
+        "annualLeaves": 0,
+        "accidentalLeaves": 6,
+        "loggedInBefore": false,
+        "role": [
+            "Coordinator"
+        ],
+        "_id": "5fdc20ac20a8a840b0a34771",
+        "name": "fawzy",
+        "email": "fawzy@mail.com",
+        "id": "3",
+        "salary": 300,
+        "office": "c5.203",
+        "faculty": "Engineering",
+        "department": "MET",
+        "dayOff": 3,
+        "attendanceRecords": [],
+        "__v": 0
+    }
+]
+*********************************************************************************************************************************************************************************************************************************************
+Function: It shows the dayoff of the staff of his department
+
+
+Route:/HOD/viewAllthestaffdayoff
+
+Request type: GET
+
+Request Parameters : The staff of his departement we would show their info 
+
+Response: [
+    {
+        "_id": "5fdbd8543a18b23ed0fca91c",
+        "name": "Ahmad",
+        "email": "adham@mail.com",
+        "id": "1",
+        "dayOff": 0
+    },
+    {
+        "_id": "5fdc20ac20a8a840b0a34771",
+        "name": "fawzy",
+        "email": "fawzy@mail.com",
+        "id": "3",
+        "dayOff": 3
+    },
+    {
+        "_id": "5fdc222fd66b703c04154faf",
+        "name": "nelly",
+        "email": "nellyy@mail.com",
+        "id": "5",
+        "dayOff": 0
+    },
+    {
+        "_id": "5fdc23a2d66b703c04154fb0",
+        "name": "noha",
+        "email": "noha@mail.com",
+        "id": "6",
+        "dayOff": 1
+    },
+    {
+        "_id": "5fdc244bd66b703c04154fb1",
+        "name": "medhat",
+        "email": "medhat@mail.com",
+        "id": "7",
+        "dayOff": 4
+    },
+    {
+        "_id": "5fdfe404c3697f029fd8ecec",
+        "name": "Marwa",
+        "email": "marwa@mail.com",
+        "id": "10",
+        "dayOff": 5
+    }
+]
+
+
+********************************************************************************************************************************************************************************************************************************************
+
+Function:It is used to view the dayoff of single staff within his department
+
+Route:/HOD/viewSinglestaffdayOff
+
+RequestType:POST
+
+RequestBody:{
+   "staffid":"5"
+
+}
+
+Response:[
+    {
+        "_id": "5fdc222fd66b703c04154faf",
+        "name": "nelly",
+        "email": "nellyy@mail.com",
+        "id": "5",
+        "dayOff": 0
+    }
+]
+********************************************************************************************************************************************************************************************************************************************
+Function: It is used to show requests dayoff or leaves sent to the HOD within his department
+
+Route:/HOD/viewRequestsdayoffoRleaves
+
+Request parameters: The requests dayoff/leave sent by the staff members of his department
+
+RequestType:GET
+
+Response:[
+    {
+        "_id": "5fe00c24c3697f029fd8ecf8",
+        "type": "Change dayoff",
+        "sender": "6",
+        "reciever": "1",
+        "startDate": "2019-12-31T00:00:00.000Z",
+        "endDate": "2019-12-31T22:00:00.000Z",
+        "comment": "",
+        "status": "Pending"
+    },
+    {
+        "_id": "5fe00d73c3697f029fd8ecf9",
+        "status": "Pending",
+        "type": "Change dayoff",
+        "sender": "7",
+        "reciever": "1",
+        "startDate": "2019-12-31T22:00:00.000Z",
+        "endDate": "2019-12-31T22:00:00.000Z",
+        "comment": ""
+    },
+    {
+        "_id": "5fe00f9dc3697f029fd8ecfa",
+        "type": "Annual Leaves",
+        "sender": "10",
+        "reciever": "1",
+        "startDate": "2020-02-01T22:00:00.000Z",
+        "endDate": null,
+        "status": "Pending"
+    },
+    {
+        "_id": "5fe010d3c3697f029fd8ecfb",
+        "type": "Sick Leaves",
+        "sender": "6",
+        "reciever": "1",
+        "startDate": "2020-08-31T22:00:00.000Z",
+        "endDate": null,
+        "status": "Pending"
+    }
+]
+*********************************************************************************************************************************************************************************************************************************************
+Function:It accepts the pending request sent by staffmember of his department and some effects on staffmember annual leaves or accidental leaves or changedayoff and if is dayoff it also changes the days of that member in our schedule model
+
+Route:/HOD/AcceptRequest
+
+RequestType:POST
+
+RequestBody:{
+    "req_id":"5fe00c24c3697f029fd8ecf8"
+}
+
+RequestResponse:Your request has been accepted
+********************************************************************************************************************************************************************************************************************************************
+Function:It rejects the pending request sent by staffmember of his department
+
+
+Route:/HOD/rejectRequest
+
+RequestType:POST
+
+RequestBody:{
+    "req_id":"5fe00c24c3697f029fd8ecf8"
+}
+
+RequestResponse:Your request has been Rejected
+**********************************************************************************************************************************************************************************************************************************************
+Function:It views the coverage of the course within his department
+
+Route:/HOD/viewCoursecoverage
+
+RequestType:POST
+
+RequestBody:{
+    "id":"1"
+}
+
+RequestResponse:66.66666666666667
+**********************************************************************************************************************************************************************************************************************************************
+Function:It views the teaching assignments of courses of his department
+
+
+Route:/HOD/viewteachingassignments
+
+RequestType:POST
+
+RequestBody:{
+    "courseid":"1"
+}
+
+
+RequestResponse: [
+    {
+        "academicMember": "6",
+        "_id": "5fe0001fc3697f029fd8ecf4",
+        "course": "1",
+        "slot": 3,
+        "day": 3
+    },
+    {
+        "academicMember": "7",
+        "_id": "5fe0006dc3697f029fd8ecf5",
+        "course": "1",
+        "slot": 1,
+        "day": 5
+    },
+    {
+        "academicMember": "10",
+        "_id": "5fe001f8c3697f029fd8ecf6",
+        "course": "1",
+        "slot": 4,
+        "day": 2
+    }
+]
+******************************************************************************************************************************************************************************************************************************
+
+
+
+
+
+Instructor functions
+Functionality: View the courses that the logged in instructor is assigned to.
+Route: /instructor/viewCoverage
+Request type: GET
+Response: An array that contains all the courses where the user is assigned as an
+instructor
+Example of response:
+If the ID of the instructor is ‘ac_1’ and he/she is assigned as an instructor to
+course ‘csen701’
+[{“name”:”csen701”,instructors:[“ac_1”,”ac_2”],coordinator:”ac_3”,”TAs”:
+[“ac_4”]}]
+------------------------------------------------------------------------------------------------
+Functionality: View the schedules of all the courses in which the user is an
+instructor.
+Route:/instructor/viewSlots
+Request type: GET
+Response: An array that contains array(s) containing all the schedules of the
+courses in which the user is an instructor separated by course.
+Example of response:
+[
+[
+{academicMember:null,_id:5fe352a64649d5152c31ee66,course:'csen701',day:3,slot:5,location:’room2’,__v:0}
+],
+[{academicMember:null,_id:5fe3a4dcbcbaf008488a5c87,course:'csen704',day:4,slot:2,location:'room3',__v:0}
+]
+]
+------------------------------------------------------------------------------------------------
+Functionality: View all the profiles of the staff belonging to the same
+department that the user belongs to or view all the profiles of the staff
+belonging in the courses where the user is an instructor.
+Route:/instructor/viewStaff
+Request type: GET
+Request Body: if you want the profiles belonging to the same department
+{“department”:”iet”}.if you want the profiles of staff in the courses no input is
+required.
+Response:In both cases an array containing the profiles of the staff members
+Example of response:
+[
+{role:['TA'],annualLeaves:0,accidentalLeaves:6,loggedInBefore:false,_id:5fe350d4b849124358ae9a00,id:'6',
+name:'adel',email:'f@f',salary:1,department:'iet',attendanceRecords:[]},{role:
+['instructor'],annualLeaves:0,accidentalLeaves:6,loggedInBefore:false,_id:5fe4945edf0220154f9c1302,
+name:'tito',salary:2,email:'t@t',department:'iet',id:'2',attendanceRecords:[]}
+]
+------------------------------------------------------------------------------------------------
+Functionality: Assign an academic member to a slot schedule where no
+academic member is assigned.
+Route:/instructor/assignToUnassigned
+Request type: POST
+Request Body: {“_id”:”5fe6403dcab29bbe6121311d”,”id”:”ac_6”}
+_id is the object id of the slot
+Response: A message
+Example of response:If the entered staff id does not exist
+"Staff member id entered does not exist"
+if the position is already taken
+"There is an academic member already assigned to this slot"
+if the assignment is successful
+"assignment is complete"
+------------------------------------------------------------------------------------------------
+Functionality: Update or delete an academic member assigned to a slot.
+Route:/instructor/updateDelMem
+Request type:POST
+Request Body:{“slotID”:”5fe6403dcab29bbe6121311d”,”newID”:”ac_1”}
+slotID is the object id of the slot
+if you don’t enter a new ID the assigned member will be removed from the
+entered slot ID
+Response: A message
+Example of response: If you assign a new member
+"The record has been updated"
+If you delete an assignment
+"assignment has been deleted"
+------------------------------------------------------------------------------------------------
+Functionality: Remove a member from a course
+Route:/instructor/removeMember
+Request type: POST
+Request Body:{“courseName”:”csen703”,”memID”:”ac_2”}
+Response: A message
+Example of response : If you remove a coordinator
+"Coordinator has been removed"
+If you try to remove another instructor
+"You cannot remove another instructor"
+If you try to remove a member that doesn’t exist
+"The ID entered was not found in this course"
+If the removal is successful
+"TA has been removed"
+------------------------------------------------------------------------------------------------
+
+Functionality: Remove a member from a course
+Route:/instructor/removeMember
+Request type: POST
+Request Body:{“courseName”:”csen703”,”memID”:”ac_2”}
+Response: A message
+Example of response : If you remove a coordinator
+"Coordinator has been removed"
+If you try to remove another instructor
+"You cannot remove another instructor"
+If you try to remove a member that doesn’t exist
+"The ID entered was not found in this course"
+If the removal is successful
+"TA has been removed"
+-------------------------------------------------------------------------------------------------------------
+
+
+Functionality: Assign a coordinator to a course
+Route:/instructor/assignCourseC
+Request type:POST
+Request body:{“courseName”:”csen703”,”coorID”:”ac_10”}
+Response:message
+Example of response:"Coordinator has been assigned"
+------------------------------------------------------------------------------
+Coordinator functions
+Functionality:View all slot linking requests sent to the user.
+Route:/coordinator/viewSlotLinking
+Request type:GET
+Response:An array containing all the requests that were sent to the user with
+type of slot linking.
+Example of response:
+[{“_id”:”5fe11c66958501e9de2ee505“,”receiver”:”ac_2”,”sender”:”ac_4”,”typ
+e”:”Slot
+Linking”,”status”:”Pending”,”schedule_ID”:”5fe3a45a9820c7355079167b”}]
+------------------------------------------------------------------------------------------------
+Functionality:Accept a slot linking requests.
+Route:/coordinator/acceptRequest
+Request type:POST
+Request Body:{“_id”:”request id”} just like
+{“_id”:”5fe11c66958501e9de2ee505”}
+Response:A message
+Example of response:If request is accepted
+"Request Accepted"
+If the sender is already assigned to the slot the sender requested
+"A TA is already assigned to this slot"
+If the sender does not belong to the course this slot belongs to
+"The request sender does not belong to this course"
+------------------------------------------------------------------------------------------------
+Functionality:Reject a slot linking requests.
+Route:/coordinator/RejectRequest
+Request type:POST
+Request Body:{“_id”:”request id”} just like
+{“_id”:”5fe11c66958501e9de2ee505 “}
+Response:A message
+Example of response:If request is rejected
+"Request has been rejected"
+If request sender does not belong to the course the slot belongs to
+"The request sender does not belong to this course"
+------------------------------------------------------------------------------------------------
+Functionality: Adding a slot to the schedule
+Route:/coordinator/addSlot
+Request type: POST
+Request body: {“courseName”:”csen703”,”location”:”room2”,”slot":4,"day":3}
+Response: A message
+Example of response: If the user is not a coordinator for the course
+"you are not a coordinator in this course"
+If the slot is already taken
+"This slot is already occupied"
+If the slot addition is successful
+"Slot added successfully"
+If there are any missing fields
+"please make you sure that you have entered the required fields"
+------------------------------------------------------------------------------------------------
+Functionality: Updating slot information
+Route:/coordinator/updateSlot
+Request type: POST
+Request Body:
+{“courseName”:”csen703”,”location”:”room2”,”slot":4,"day":3}
+you don’t have to use all the fields you can change any one or more field
+like {“day":3} changing day only or {“slot":4} changing slot time etc.
+Response: A message
+Example of response: If the user is not a coordinator for the course
+"you are not a coordinator in this course"
+If the slot is already taken
+"This slot is already occupied"
+------------------------------------------------------------------------------------------------
+Functionality:Delete a slot
+Route:/coordinator/deleteSlot
+Request type:POST
+Request Body:{“slotID”:”5fe352a64649d5152c31ee66”}
+Response:A message
+Example of response:
+Example of response: If the user is not a coordinator for the course
+you are not a coordinator in this course
+If slot is deleted
+"slot has been deleted"
+------------------------------------------------
+Functionality: View a Schedule and replacements if present.
+Route: AcademicMember/viewSchedule
+Request type: GET
+Response: object of two 2 objects(actull schedule, replacement done within current month), each object is an array that contains full data about the slot and its actuall date
+response Examples : {
+    "schedule": [
+        {
+            "academicMember": "ac-1",
+            "_id": "5fe637b7cab29bbe6121311b",
+            "location": "C7-203",
+            "day": 4,
+            "slot": 1,
+            "course": "CS2"
+        }
+    ],
+    "ReplacementSchedule": [
+        {
+            "date": "2020-12-24T00:00:00.000Z",
+            "slot": {
+                "academicMember": "ac-2",
+                "_id": "5fe60954e530173e3cdb3462",
+                "location": "C7-203",
+                "day": 4,
+                "slot": 5,
+                "course": "CS2",
+                "__v": 0
+            }
+        }
+    ]
+}
+
+Functionality: Send a slot linking request .
+Route: AcademicMember/slotLinking
+Request type: POST
+Request body: {
+    "schedule" : "5fe60954e530173e3cdb3462"
+}
+
+Functionality: view Replacment Requests
+Route: AcademicMember/viewReplacmentRequest
+Request type: GET
+Response : 
+response example : {
+    "sent_requests": [
+        {
+            "replacementList": [],
+            "_id": "5fe63285a6e0fa3294d9df4c",
+            "type": "Replacement",
+            "sender": "ac-2",
+            "receiver": "ac-1",
+            "requestDate": "2020-12-25T00:00:00.039Z",
+            "startDate": "2020-12-24T00:00:00.000Z",
+            "status": "Accepted",
+            "schedule_ID": "5fe60954e530173e3cdb3462",
+            "__v": 0
+        }
+    ],
+    "received_requests": []
+}
+
+Functionality: Send Annual Leaves request.
+Route: AcademicMember/SendRequest
+Request type: POST
+Request body :{
+    "startDate":"2020-12-26T00:00:00.000Z",
+    "endDate":"2020-12-30T00:00:00.000Z",
+    "type":"Annual Leaves"
+}
+
+Functionality: Send Accidental Leaves request .
+Route: AcademicMember/SendRequest
+Request type: POST
+Request body :{
+    "startDate":"2020-12-26T00:00:00.000Z",
+    "endDate":"2020-12-30T00:00:00.000Z",
+    "type":"Accidental Leaves"
+}
+
+Functionality: Send Sick Leaves request .
+Route: AcademicMember/SendRequest
+Request type: POST
+Request body :{  
+    "startDate":"2020-12-23T00:00:00.000Z",
+    "type":"Sick Leaves"
+}
+
+Functionality: Send Maternity Leaves request .
+Route: AcademicMember/SendRequest
+Request type: POST
+Request body :{  
+    "startDate":"2020-12-23T00:00:00.000Z",
+    "type":"Maternity Leaves"
+}
+
+Functionality: Send Compensation Leaves request.
+Route: AcademicMember/SendRequest
+Request type: POST
+Request body : {
+    "compensationDate":"2020-12-23T00:00:00.000Z",
+    "startDate": "2020-12-20T00:00:00.000Z",
+    "endDate": "2020-12-20T00:00:00.000Z",
+    "type":"Compensation Leaves"
+}
+
+Functionality: Send Change dayoff request.
+Route: AcademicMember/SendRequest
+Request type: POST
+Request body :{
+    "newDayOff":4,
+    "type":"Change dayoff"
+}
+
+Functionality: Send Replacement request.
+Route: AcademicMember/SendRequest
+Request type: POST
+Request body : {
+    "startDate":"2020-12-24T00:00:00.000Z",
+    "receiver":"ac-1",
+    "slot":"5fe60954e530173e3cdb3462",
+    "type":"Replacement"
+}
+
+Functionality: view different types of requests
+Route: AcademicMember/ViewRequest
+Request type: GET
+Request body : {}
+Response : array of request with the type specified by the user 
+response example : {
+    "sent_requests": [
+        {
+            "replacementList": [],
+            "_id": "5fe63285a6e0fa3294d9df4c",
+            "type": "Replacement",
+            "sender": "ac-2",
+            "receiver": "ac-1",
+            "requestDate": "2020-12-25T00:00:00.039Z",
+            "startDate": "2020-12-24T00:00:00.000Z",
+            "status": "Accepted",
+            "schedule_ID": "5fe60954e530173e3cdb3462",
+            "__v": 0
+        }
+    ],
+    "received_requests": []
+}
+ 
+Functionality: Cancel a still pending request
+Route: AcademicMember/CancelRequest
+Request type: POST
+Request body : {
+  "_id":"5fe6147a11efb338e04efe4f"
+}
+
+Functionality: view rewuests
+Route: AcademicMember//ViewRequest
+Request type: GET
+Request body : {}  
+response : array of requests 
+response example : {
+	[
+    {
+        "replacementList": [],
+        "_id": "5fe627777bd65f1a1c7970da",
+        "type": "Annual Leaves",
+        "sender": "ac-2",
+        "receiver": "ac-1",
+        "requestDate": "2020-12-25T00:00:00.934Z",
+        "status": "Pending",
+        "startDate": "2020-12-26T00:00:00.000Z",
+        "endDate": "2020-12-30T00:00:00.000Z",
+        "__v": 0
+    },
+    {
+        "replacementList": [],
+        "_id": "5fe627df7bd65f1a1c7970db",
+        "type": "Accidental Leaves",
+        "sender": "ac-2",
+        "receiver": "ac-1",
+        "requestDate": "2020-12-25T00:00:00.909Z",
+        "status": "Pending",
+        "startDate": "2020-12-26T00:00:00.000Z",
+        "endDate": "2020-12-30T00:00:00.000Z",
+        "__v": 0
+    },
+    {
+        "replacementList": [],
+        "_id": "5fe629d218d3ba0cb07df1cd",
+        "type": "Sick Leaves",
+        "sender": "ac-2",
+        "receiver": "ac-1",
+        "requestDate": "2020-12-25T00:00:00.147Z",
+        "status": "Pending",
+        "startDate": "2020-12-26T00:00:00.000Z",
+        "endDate": "2021-01-10T00:00:00.000Z",
+        "__v": 0
+    },
+    {
+        "replacementList": [],
+        "_id": "5fe62bcd37c7691e68356bc2",
+        "type": "Maternity Leaves",
+        "sender": "ac-2",
+        "receiver": "ac-1",
+        "requestDate": "2020-12-25T00:00:00.279Z",
+        "status": "Pending",
+        "startDate": "2020-12-30T00:00:00.000Z",
+        "endDate": "2021-01-14T00:00:00.000Z",
+        "__v": 0
+    },
+    {
+        "replacementList": [],
+        "_id": "5fe62f78a6e0fa3294d9df4b",
+        "type": "Change dayoff",
+        "sender": "ac-2",
+        "receiver": "ac-1",
+        "requestDate": "2020-12-25T00:00:00.958Z",
+        "status": "Pending",
+        "changedDayOff": 4,
+        "__v": 0
+    },
+    {
+        "replacementList": [],
+        "_id": "5fe63285a6e0fa3294d9df4c",
+        "type": "Replacement",
+        "sender": "ac-2",
+        "receiver": "ac-1",
+        "requestDate": "2020-12-25T00:00:00.039Z",
+        "startDate": "2020-12-24T00:00:00.000Z",
+        "status": "Accepted",
+        "schedule_ID": "5fe60954e530173e3cdb3462",
+        "__v": 0
+    }
+]
+}
+ 
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
