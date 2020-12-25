@@ -1,6 +1,4 @@
-export class Functions {
-
-    getStartEndDates() {
+    function getStartEndDates() {
         const currentDate = new Date();
         const currentDay = currentDate.getDate();
         const currentMonth = currentDate.getMonth();
@@ -42,7 +40,7 @@ export class Functions {
     }
 
     // return 1 -> date_One > date_Two , 0 -> date_One = date_Two, -1 -> date_One < date_Two
-    compareDates(date_One, date_Two) {
+    function compareDates(date_One, date_Two) {
         if (date_One.getFullYear() > date_Two.getFullYear())
             return 1;
         else if (date_One.getFullYear() < date_Two.getFullYear())
@@ -63,7 +61,7 @@ export class Functions {
         }
     }
 
-    missingDays_missingHours_extraHours(records, leaves, dayOff, startDate, endDate) {
+    function missingDays_missingHours_extraHours(records, leaves, dayOff, startDate, endDate) {
         let missingDays = [];
         let dayAttendance, dayLeaves, dayWeek, signIn, signOut;
         let foundSignOut = false, attended = false;
@@ -118,4 +116,6 @@ export class Functions {
         }
         return { missingDays: missingDays, missingHours: missingHours, extraHours: extraHours }
     }
-}
+
+
+module.exports =  {getStartEndDates :  getStartEndDates, compareDates : compareDates,missingDays_missingHours_extraHours : missingDays_missingHours_extraHours };
