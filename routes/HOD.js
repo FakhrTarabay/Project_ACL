@@ -28,8 +28,6 @@ router.use(async (req,res,next)=> {
 /*  This route to assign an Instructor to a course*/
 router.route('/assignCourse')
 .post(async (req,res) =>{
-    const token = req.user.id
-    if(token){
         try{
             const staff_ID =  req.user.id
             const memberstaff = await staffMemberModel.findOne({id:staff_ID})
@@ -95,15 +93,14 @@ router.route('/assignCourse')
             console.log("There is an error")    
         }
 
-    }        
+           
 });
 
 //The end of the route to assign a constructor
 //This route is to update the constructor
 router.route('/updateCourseInstructors')
 .post(async (req,res)=>{
-    const token = req.user.id
-    if(token){
+    
         try{
             const staff_ID = req.user.id
             const memberstaff = await staffMemberModel.findOne({id:staff_ID})
@@ -191,13 +188,12 @@ router.route('/updateCourseInstructors')
              // console.log("You are trying to delete one from another department")    
             res.send("You are trying to update with one from another department")
         }
-    }            
+                
 });
 
 router.route('/deleteCourseInstructors')
 .post(async (req,res) =>{
-    const token = req.user.id
-    if(token){
+   
       try{
        const staff_ID = req.user.id;
        const memberstaff = await staffMemberModel.findOne({id:staff_ID})
@@ -266,14 +262,13 @@ router.route('/deleteCourseInstructors')
         console.log("There is an error")    
         res.send(error)
     }  
-}          
+         
 });
 
        
 router.route('/viewStaffdepartment')
 .get(async(req,res)=>{
-    const token = req.user.id
-    if(token){          
+             
         try{
             const staff_ID = req.user.id;
             const memberstaff = await staffMemberModel.findOne({id:staff_ID})
@@ -297,13 +292,12 @@ router.route('/viewStaffdepartment')
             console.log("There is an error")    
             res.send(error)
         }
-    }
+    
 });
 
 router.route('/viewCoursestaff')
 .post(async (req,res) =>{
-    const token = req.user.id
-    if(token){
+  
         try{
             //HOD ID was taken from token
             const staff_ID = req.user.id;
@@ -360,14 +354,13 @@ router.route('/viewCoursestaff')
             console.log("There is an error")    
             res.send(error)
         }
-    }
+    
 })
 
     
 router.route('/viewAllthestaffdayoff')
 .get(async (req,res) =>{
-    const token = req.user.id
-    if(token){
+ 
         try{
         //HOD INFO WE GET FROM THE TOKEN
         const staff_ID = req.user.id;
@@ -389,13 +382,12 @@ router.route('/viewAllthestaffdayoff')
             console.log("There is an error")    
             res.send(error)
         }
-    }
+    
 });
 
 router.route('/viewSinglestaffdayOff')
 .post(async (req,res)=>{
-    const token = req.user.id
-    if(token){
+   
         try{    
             //HOD INFO WE GET FROM THE TOKEN
             const staff_ID = req.user.id;
@@ -441,13 +433,12 @@ router.route('/viewSinglestaffdayOff')
             console.log("There is an error")    
             res.send(error)
         }
-    }
+   
 })
 
 router.route('/viewRequestsdayoffoRleaves')
 .get(async (req,res)=>{
-    const token = req.user.id
-    if(token){
+   
         try{
             //HOD INFO WE GET FROM THE TOKEN
             const staff_ID = req.user.id;
@@ -477,13 +468,11 @@ router.route('/viewRequestsdayoffoRleaves')
             console.log("There is an error")    
             res.send(error)
         }
-    }
+ 
 })
 
 router.route('/AcceptRequest')
 .post(async (req,res)=>{
-    const token = req.user.id
-    if(token){
         try{
             const req_given_type = req.body.req_id
             const reqx =await requestModel.findOne({_id:req_given_type}) 
@@ -500,10 +489,8 @@ router.route('/AcceptRequest')
             const dayToget = req.body.day
             try{
                 if(reqx.type=="change dayoff"){
-                    console.log(1)
                     if(req.body.day){
-                        console.log(12)
-                        await requestModel.updateOne({_id:req_given_type},{status:"Accepted"})    
+                       await requestModel.updateOne({_id:req_given_type},{status:"Accepted"})    
                         for(var i = 0;i<schedule_of_sender.length;i++){
                             if(dayToget == (schedule_of_sender[i].day))
                                 await scheduleModel.updateOne({academicMember:reqx.sender,day:schedule_of_sender[i].day},{academicMember:null})
@@ -516,16 +503,28 @@ router.route('/AcceptRequest')
                     }
                 }
                 if(reqx.type=="Annual Leaves"){
+                  if(annualLeaves_of_the_sender<30){
                     await requestModel.updateOne({_id:req_given_type},{status:"Accepted"}) 
                     annualLeaves_of_the_sender = annualLeaves_of_the_sender+1;
                     await staffMemberModel.updateOne({id:sender_of_the_request},{annualLeaves:annualLeaves_of_the_sender})
                     res.send("Your request has been accepted")
+                   }
+                    else{
+                      await requestModel.updateOne({_id:req_given_type},{status:"Rejected"})
+                      res.send("Your annual leaves has exceded the limit") 
+                    }
                 }
                 if(reqx.type=="Accidental Leaves"){
+                   if(accidentalLeaves_of_the_sender>0){
                     await requestModel.updateOne({type:req_given_type},{status:"Accepted"}) 
                     accidentalLeaves_of_the_sender = accidentalLeaves_of_the_sender-1;
                     await staffMemberModel.updateOne({id:sender_of_the_request},{accidentalLeaves:accidentalLeaves_of_the_sender})
                     res.send("Your request has been accepted")
+                  }
+                    else{
+                      await requestModel.updateOne({_id:req_given_type},{status:"Rejected"})
+                      res.send("Your accidental leaves has exceded the limit") 
+                    }
                 }
                 else{
                     await requestModel.updateOne({type:req_given_type},{status:"Accepted"}) 
@@ -541,13 +540,11 @@ router.route('/AcceptRequest')
         console.log("There is an error")    
         res.send(error)
     }
-}
+
 })
 
 router.route('/rejectRequest')
 .post(async (req,res)=>{
-    const token = req.user.id
-    if(token){
         //Info of a Given A Request from post
         try{
             const req_given_type = req.body.req_id
@@ -573,13 +570,12 @@ router.route('/rejectRequest')
             console.log("There is an error")    
             res.send(error)
         }
-    }
+   
 })
 
 router.route('/viewCoursecoverage')
 .post(async (req,res) =>{
-    const token = req.user.id
-    if(token){
+   
         try{
             //The id of the course that i would take as an input 
             const course_id = req.body.id
@@ -613,6 +609,7 @@ router.route('/viewCoursecoverage')
                 res.status(200).send((coverage).toString());
             }
             catch(error){
+
                 console.log("There is an error")
                 res.send(error)
             }
@@ -621,13 +618,12 @@ router.route('/viewCoursecoverage')
             console.log("There is an error")    
             res.send(error)
         }
-    }
+    
 })
 
 router.route('/viewteachingassignments')
 .post (async (req,res) =>{
-    const token = req.user.id
-    if(token){
+ 
         try{
             const staff_ID = req.user.id;
             const memberstaff = await staffMemberModel.findOne({id:staff_ID})
@@ -658,7 +654,7 @@ router.route('/viewteachingassignments')
             console.log("There is an error")    
             res.send(error)
         }
-    }
+    
 })
     
 module.exports = router;
