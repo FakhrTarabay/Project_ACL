@@ -1,2 +1,2 @@
-.env
-node_modules  //this ignore these files when uploading on github//
+.env 
+node_modules
