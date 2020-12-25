@@ -14,6 +14,20 @@ const jwt = require('jsonwebtoken')
 const functions = require('./functions')
 require('dotenv').config()
 
+router.use(async (req,res,next)=> {
+    try {
+        const role = req.user.role
+        //console.log(role)
+        if(role.includes("HR")){
+            next();
+        }
+        
+    } catch (error) {
+        res.send("You are not allowed!")
+        res.end();
+    }
+})
+
 // display location
 // Test done.
 // Read me
@@ -304,14 +318,14 @@ router.route('/updateCourse').post(async (req,res) => {
 router.route('/deleteCourse').post(async (req,res)=>{
     try {
         await departmentModel.update({name : req.body.department} , {$pull: {courses : req.body.course}},{ multi: true})
-        const staffMembers = await staffModel.find({department : req.body.department}, {id : 1,_id : 0}).map(function (staff) {
+        const staffMembers = (await staffModel.find({department : req.body.department}, {id : 1,_id : 0})).map(function (staff) {
             return staff.id;
           });
-        await courseModel.updateMany({name : req.body.course}, {$pull :{
+        await courseModel.findOneAndUpdate({name : req.body.course}, {$pull :{
             instructors : {$in : staffMembers},
-            TAs : {$in : staffMembers},
-            coordinator : {$in : staffMembers}
+            TAs : {$in : staffMembers}
         }},{ multi: true})
+        await courseModel.findOneAndUpdate({name : req.body.course, coordinator : {$in : staffMembers}}, {coordinator : null})
         await scheduleModel.update({course : req.body.course, academicMember : {$in : staffMembers}},{academicMember : null})
         res.send("Courses deleted successfully")
     } catch (error) {
@@ -524,9 +538,9 @@ router.route('/deleteStaffMember').post(async (req,res) => {
         await scheduleModel.updateMany({academicMember : req.body.staffMember} , {academicMember : null})
         await courseModel.updateMany({},{$pull: { 
             instructors :  req.body.staffMember, 
-            TAs: req.body.staffMember,
-            coordinator :  req.body.staffMember}},
+            TAs: req.body.staffMember}},
             {multi: true})
+        await courseModel.updateMany({coordinator : req.body.staffMember}, {coordinator : null} )
         await requestModel.deleteMany({$or : [
             {sender : req.body.staffMember},
             {receiver : req.body.staffMember}]})
@@ -534,7 +548,7 @@ router.route('/deleteStaffMember').post(async (req,res) => {
         await departmentModel.updateMany({HOD : member.id},{HOD : null})        
         res.send(`Staff member ${member.name} deleted successfully!`)
     } catch (error) {
-        res.send(error)
+        res.send("No staff member")
     }
 })
 
